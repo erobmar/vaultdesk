@@ -1,10 +1,19 @@
 package com.vaultdesk.negocio;
 
-import com.vaultdesk.dominio.Boveda;
+//import com.vaultdesk.dominio.Boveda;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Arrays;
 
 public class GestorPersistencia {
@@ -103,5 +112,7 @@ public class GestorPersistencia {
             Arrays.fill(claveDerivada, (byte)0);
         }
     }
+
+
 
 }

@@ -29,7 +29,7 @@ public class GestorBaseDatos {
             sentenciaCreacion.execute("""
                     CREATE TABLE tema_visual(
                         id_tema_visual INTEGER PRIMARY KEY,
-                        nombre TEXT NOT NULL    
+                        nombre TEXT NOT NULL
                         )
                     """);
 
@@ -64,6 +64,7 @@ public class GestorBaseDatos {
                         destacada INTEGER NOT NULL CHECK (destacada IN (0,1)),
                         anotaciones TEXT,
                         caduca INTEGER NOT NULL CHECK (caduca IN (0,1)),
+                        ultimo_update TEXT,
                         fecha_caducidad TEXT,
                         periodo_caducidad INTEGER,
                         req_longitud INTEGER,

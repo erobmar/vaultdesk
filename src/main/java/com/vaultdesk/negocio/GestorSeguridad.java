@@ -81,7 +81,7 @@ public class GestorSeguridad {
      *
      * @param datos - array de bytes con los datos a encriptar
      * @param claveDerivada - clave de cifrado derivada mediante contraseña maestra
-     * @param vectorInicializacion
+     * @param vectorInicializacion - Vector de inicialización
      * @return datos cifrados
      * */
     public byte[] cifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception{
@@ -103,7 +103,7 @@ public class GestorSeguridad {
      *
      * @param datos - array de bytes con los datos a encriptar
      * @param claveDerivada - clave de cifrado derivada mediante contraseña maestra
-     * @param vectorInicializacion
+     * @param vectorInicializacion - Vector de inicialización
      * @return datos descifrados
      * */
     public byte[] descifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception{
