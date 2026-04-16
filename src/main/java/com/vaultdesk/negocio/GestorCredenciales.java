@@ -6,6 +6,9 @@ import com.vaultdesk.dominio.Credencial;
 
 import javax.xml.transform.Result;
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GestorCredenciales {
 
@@ -261,6 +264,50 @@ public class GestorCredenciales {
 
     }
 
+    public List<Credencial> buscarCredenciales(Connection conexion, int idBoveda, String textoBusqueda) throws SQLException {
+
+        validarConexion(conexion);
+        validarBoveda(idBoveda);
+
+        comprobarExisteBoveda(conexion, idBoveda);
+
+        String textoNormalizado = (textoBusqueda == null) ? "":textoBusqueda.trim();
+
+        String sentenciaBusqueda = """
+                SELECT * FROM credencial 
+                where id_boveda = ? AND 
+                (
+                    url_identificador LIKE ? OR 
+                    username LIKE ? OR
+                    anotaciones LIKE ?
+                )
+                """;
+
+        List<Credencial> resultados = new ArrayList<>();
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaBusqueda)){
+
+            String patronBusqueda = "%" + textoNormalizado + "%";
+
+            sentencia.setInt(1, idBoveda);
+            sentencia.setString(2, patronBusqueda);
+            sentencia.setString(3, patronBusqueda);
+            sentencia.setString(4, patronBusqueda);
+
+            try(ResultSet setResultados = sentencia.executeQuery()){
+
+                while(setResultados.next()){
+
+                    resultados.add(mapearCredencial(setResultados));
+                }
+            }
+
+        }
+
+        return resultados;
+
+    }
+
     private void validarConexion(Connection conexion){
         if(conexion == null){
             throw new IllegalArgumentException("La conexión no puede ser nula");
@@ -383,6 +430,42 @@ public class GestorCredenciales {
 
         }
 
+    }
+
+    private Credencial mapearCredencial(ResultSet setReultados) throws SQLException {
+
+        Credencial credencial = new Credencial();
+
+        credencial.setIdCredencial(setReultados.getInt("id_credencial"));
+        credencial.setUrlIdentificador(setReultados.getString("url_identificador"));
+        credencial.setUsername(setReultados.getString("username"));
+        credencial.setPassword(setReultados.getString("password"));
+        credencial.setDestacada((setReultados.getInt("destacada")) == 1);
+        credencial.setAnotaciones(setReultados.getString("anotaciones"));
+        credencial.setCaduca((setReultados.getInt("caduca"))==1);
+
+        String fechaCaducidad = setReultados.getString("fecha_caducidad");
+        if (fechaCaducidad != null){
+            credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad));
+        }
+
+        int periodoCaducidad = setReultados.getInt("periodo_caducidad");
+        if(!setReultados.wasNull()){
+            credencial.setPeriodoCaducidad(periodoCaducidad);
+        }
+
+        String fechaUltimoUpdate = setReultados.getString("ultimo_update");
+        if(fechaUltimoUpdate != null){
+            credencial.setFechaUltimoUpdate(LocalDate.parse(fechaUltimoUpdate));
+        }
+
+        credencial.setReqLongitud(setReultados.getInt("req_longitud"));
+        credencial.setReqMayusculas(setReultados.getInt("req_mayusculas"));
+        credencial.setReqMinusculas(setReultados.getInt("req_minusculas"));
+        credencial.setReqDigitos(setReultados.getInt("req_digitos"));
+        credencial.setReqEspeciales(setReultados.getInt("req_especiales"));
+
+        return credencial;
     }
 
 }
