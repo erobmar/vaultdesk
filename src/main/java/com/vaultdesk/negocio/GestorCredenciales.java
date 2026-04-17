@@ -7,8 +7,10 @@ import com.vaultdesk.dominio.Credencial;
 import javax.xml.transform.Result;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GestorCredenciales {
 
@@ -466,6 +468,177 @@ public class GestorCredenciales {
         credencial.setReqEspeciales(setReultados.getInt("req_especiales"));
 
         return credencial;
+    }
+
+    public void cambiarEstadoDestacada(Connection conexion,
+                                        int idCredencial,
+                                        int idBoveda,
+                                        boolean destacada) throws SQLException{
+
+        validarConexion(conexion);
+
+        if(idCredencial <= 0){
+            throw new IllegalArgumentException("Id de credencial no válida");
+        }
+        if(idBoveda <= 0){
+            throw new IllegalArgumentException("Id de bóveda no válida");
+        }
+
+        comprobarExisteCredencialEnBoveda(conexion,idCredencial, idBoveda);
+
+        String sentenciaCambio = """
+                UPDATE credencial
+                SET destacada = ?
+                WHERE id_credencial = ? AND id_boveda = ?
+                """;
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaCambio)) {
+
+            sentencia.setInt(1, destacada ? 1 : 0);
+            sentencia.setInt(2, idCredencial);
+            sentencia.setInt(3, idBoveda);
+
+            sentencia.executeUpdate();
+
+        }
+    }
+
+    public boolean estaCaducada(Credencial credencial, LocalDate fechaReferencia){
+
+        if(credencial == null){
+            throw new IllegalArgumentException("La credencial no puede ser nula");
+        }
+
+        if(fechaReferencia == null){
+
+            throw new IllegalArgumentException("La fecha de referencia no puede ser nula");
+        }
+
+        // Si la credencial NO caduca por definición
+        if(!credencial.isCaduca()){
+            return false;
+        }
+
+        LocalDate fechaCaducidad = calcularFechaCaducidadReal(credencial);
+
+        if(fechaCaducidad == null){
+            return false;
+        }
+
+        return !fechaCaducidad.isAfter(fechaReferencia);
+
+    }
+
+
+    public boolean estaProximaCaducar (Credencial credencial, LocalDate fechaReferencia, int umbral){
+
+        if(credencial == null){
+            throw new IllegalArgumentException("La credencial no puede ser nula");
+        }
+
+        if(fechaReferencia == null){
+            throw new IllegalArgumentException("La fecha de referencia no puede ser nula");
+        }
+
+        if(umbral < 0){
+            throw new IllegalArgumentException("El umbral de días no puede ser negativo");
+        }
+
+        if(!credencial.isCaduca()){
+            return false;
+        }
+
+        LocalDate fechaCaducidad = calcularFechaCaducidadReal(credencial);
+
+
+        if(fechaCaducidad == null){
+            return false;
+        }
+
+        if(estaCaducada(credencial, fechaReferencia)){
+            return false;
+        }
+
+        return !fechaCaducidad.isAfter(fechaReferencia.plusDays(umbral));
+
+    }
+
+
+    private LocalDate calcularFechaCaducidadReal(Credencial credencial){
+
+        if(credencial == null){
+            throw new IllegalArgumentException("La credencial no puede ser nula");
+        }
+
+        if(!credencial.isCaduca()){
+            return null;
+        }
+
+        if(credencial.getFechaCaducidad() != null){
+            return credencial.getFechaCaducidad();
+        }
+
+        // Si tiene un periodo de caducidad establecido
+        if(credencial.getPeriodoCaducidad() > 0 && credencial.getFechaUltimoUpdate() != null){
+
+            long dias = credencial.getPeriodoCaducidad() / 86400L; // Número de segundos en un día
+
+            return credencial.getFechaUltimoUpdate().plusDays(dias);
+
+        }
+
+        return null;
+
+
+    }
+
+
+    public String actualizarPassword(Connection conexion, int idBoveda, Credencial credencial) throws SQLException{
+
+        validarConexion(conexion);
+        validarBoveda(idBoveda);
+
+        if(conexion == null){
+            throw new IllegalArgumentException("La conexión no puede ser nula");
+        }
+
+        if(credencial.getIdCredencial() <= 0){
+            throw new IllegalArgumentException("El id de credencial no es válido");
+        }
+
+        comprobarExisteCredencialEnBoveda(conexion, credencial.getIdCredencial(), idBoveda);
+
+        GestorPasswords gestorPasswords = new GestorPasswords();
+
+        String nuevoPassword = gestorPasswords.generarPassword(credencial);
+        LocalDate fechaActualizacion = LocalDate.now();
+
+        String sentenciaActualizacion = """
+                UPDATE credencial
+                SET password = ?, ultimo_update = ?
+                WHERE id_credencial = ? AND id_boveda = ?
+                """;
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaActualizacion)){
+
+            sentencia.setString(1, nuevoPassword);
+            sentencia.setString(2, fechaActualizacion.toString());
+            sentencia.setInt(3, credencial.getIdCredencial());
+            sentencia.setInt(4, idBoveda);
+
+            int filasActualizadas = sentencia.executeUpdate();
+
+            if(filasActualizadas == 0){
+                throw new SQLException("No se pudo actualizar el password de la credencial");
+            }
+
+            credencial.setPassword(nuevoPassword);
+            credencial.setFechaUltimoUpdate(fechaActualizacion);
+
+            return nuevoPassword;
+
+        }
+
     }
 
 }

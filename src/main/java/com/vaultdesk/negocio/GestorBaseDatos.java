@@ -1,5 +1,7 @@
 package com.vaultdesk.negocio;
 
+import org.sqlite.SQLiteConnection;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -116,5 +118,34 @@ public class GestorBaseDatos {
         return conexion;
 
     }
+
+    public byte[] serializarBaseDatos(Connection conexion) throws SQLException{
+
+        if(conexion == null){
+            throw new IllegalArgumentException("La conexión no puede ser nula");
+        }
+
+        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
+        return conexionSQLite.serialize("main");
+    }
+
+    public Connection cargarBaseDatosDesdeBytes(byte[] datoBaseDatos) throws SQLException{
+
+        if(datoBaseDatos == null || datoBaseDatos.length == 0){
+            throw new IllegalArgumentException("La base de datos no puede ser nula");
+        }
+
+        Connection conexion = abrirConexionEnMemoria();
+
+        try (Statement sentencia = conexion.createStatement()){
+            sentencia.execute("PRAGMA foreign_keys = ON");
+        }
+
+        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
+        conexionSQLite.deserialize("main", datoBaseDatos);
+
+        return conexion;
+    }
+
 
 }

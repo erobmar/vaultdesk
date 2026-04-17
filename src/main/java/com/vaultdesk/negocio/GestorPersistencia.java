@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 
@@ -113,6 +114,20 @@ public class GestorPersistencia {
         }
     }
 
+    public Connection abrirBovedaEnMemoria(Path ruta, char[] passwordMaestra) throws Exception {
 
+        GestorBaseDatos gestorBaseDatos = new GestorBaseDatos();
+        byte[] datosBaseDatos = abrirArchivoBoveda(ruta, passwordMaestra);
+        return gestorBaseDatos.cargarBaseDatosDesdeBytes(datosBaseDatos);
+    }
+
+    public void guardarBovedaDesdeMemoria(Path ruta, char[] passwordMaestra, Connection conexion) throws Exception{
+
+        GestorBaseDatos gestorBaseDatos = new GestorBaseDatos();
+        byte[] datosBaseDatos = gestorBaseDatos.serializarBaseDatos(conexion);
+        guardarArchivoBoveda(ruta, passwordMaestra, datosBaseDatos);
+
+        Arrays.fill(datosBaseDatos, (byte)0); // Borrado seguro de memoria
+    }
 
 }
