@@ -1,20 +1,16 @@
-package com.vaultdesk.negocio;
+package com.vaultdesk.persistencia;
 
 //import com.vaultdesk.dominio.Boveda;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import com.vaultdesk.dominio.Boveda;
+import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
+import com.vaultdesk.negocio.GestorSeguridad;
+
+import javax.crypto.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 
 public class GestorPersistencia {
@@ -54,6 +50,8 @@ public class GestorPersistencia {
             // 5 - Leer 4 bytes: longitud de clave
             int longitudClave = entrada.readInt();
 
+            // TODO - Validar iteraciones y longitudClave con constantes del sistema
+
             // 6 - Leer 12 bytes: vector de inicialización
             byte[] vectorInicializacion = new byte[12];
             entrada.readFully(vectorInicializacion);
@@ -61,6 +59,9 @@ public class GestorPersistencia {
             // 7 - Leer 4 bytes: longitud de bloque cifrado - integridad
             int longitudBloqueDatos = entrada.readInt();
 
+            if(longitudBloqueDatos <= 0){
+                throw new IOException("La longitud del bloque cifrado no es válida");
+            }
 
             // 8 - Leer bloque de datos cifrado
             byte[] bloqueCifrado = new byte[longitudBloqueDatos];
@@ -70,13 +71,20 @@ public class GestorPersistencia {
             byte[] claveDerivada = gestorSeguridad.derivarClave(passwordMaestra, salt);
 
             // 10 - Descifrar bloque cifrado -> clave derivada, iv, bloque de datos
-            byte[] datosDescifrados = gestorSeguridad.descifrar(bloqueCifrado,claveDerivada,vectorInicializacion);
+            try {
+                byte[] datosDescifrados = gestorSeguridad.descifrar(bloqueCifrado, claveDerivada, vectorInicializacion);
 
-            // 11 - Limpiar la clave derivada en memoria
-            Arrays.fill(claveDerivada, (byte)0);
+                // 11 - Devolver resultado
+                return datosDescifrados;
+            } catch (BadPaddingException e){
 
-            // 12 - Devolver resultado
-            return datosDescifrados;
+                throw new ExcepcionIntegridadBoveda("La bóveda está corrupta, ha sido modificada o la contraseña es incorrecta", e);
+            }
+            finally {
+                // 12 - Limpiar la clave derivada en memoria
+                Arrays.fill(claveDerivada, (byte)0);
+            }
+
 
         }
 
@@ -96,10 +104,10 @@ public class GestorPersistencia {
             byte[] bloqueCifrado = gestorSeguridad.cifrar(bloqueDatos, claveDerivada,vectorInicializacion);
 
             try(DataOutputStream salida = new DataOutputStream(new FileOutputStream(ruta.toFile()))){
-                salida.write("VLTD".getBytes(StandardCharsets.UTF_8));
+                salida.write(identificador.getBytes(StandardCharsets.UTF_8));
                 salida.writeByte(1);    // Añadir nuevas versiones en futuras itereaciones
                 salida.write(salt);
-                salida.writeInt(600000); // Añadir un archivo con constantes
+                salida.writeInt(600000); // Añadir un archivo con constantes - iteraciones
                 salida.writeInt(256);   // Longitud de la clave
                 salida.write(vectorInicializacion);
                 salida.writeInt(bloqueCifrado.length);
@@ -118,16 +126,42 @@ public class GestorPersistencia {
 
         GestorBaseDatos gestorBaseDatos = new GestorBaseDatos();
         byte[] datosBaseDatos = abrirArchivoBoveda(ruta, passwordMaestra);
-        return gestorBaseDatos.cargarBaseDatosDesdeBytes(datosBaseDatos);
+        try {
+            return gestorBaseDatos.cargarBaseDatosDesdeBytes(datosBaseDatos);
+        }
+        finally {
+            Arrays.fill(datosBaseDatos, (byte) 0);
+        }
     }
 
     public void guardarBovedaDesdeMemoria(Path ruta, char[] passwordMaestra, Connection conexion) throws Exception{
 
         GestorBaseDatos gestorBaseDatos = new GestorBaseDatos();
         byte[] datosBaseDatos = gestorBaseDatos.serializarBaseDatos(conexion);
-        guardarArchivoBoveda(ruta, passwordMaestra, datosBaseDatos);
+        try {
+            guardarArchivoBoveda(ruta, passwordMaestra, datosBaseDatos);
+        }
+        finally {
+            Arrays.fill(datosBaseDatos, (byte) 0); // Borrado seguro de memoria
+        }
+    }
 
-        Arrays.fill(datosBaseDatos, (byte)0); // Borrado seguro de memoria
+    public void cambiarPasswordMaestra(Path ruta, char[] passwordActual, char[] nuevaPassword) throws Exception{
+
+        Connection conexion = null;
+
+        try{
+            conexion = abrirBovedaEnMemoria(ruta, passwordActual);
+
+            guardarBovedaDesdeMemoria(ruta,nuevaPassword, conexion);
+        } finally {
+            if(conexion != null){
+                conexion.close();
+            }
+        }
+
+
+
     }
 
 }

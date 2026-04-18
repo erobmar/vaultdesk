@@ -1,4 +1,4 @@
-package com.vaultdesk.negocio;
+package com.vaultdesk.persistencia;
 
 import org.sqlite.SQLiteConnection;
 
