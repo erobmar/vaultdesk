@@ -19,9 +19,11 @@ public class VistaPrincipal {
 
         MenuBar menu = new MenuBar();
 
+
+        // Menú Archivo...
         Menu menuArchivo = new Menu("Archivo");
 
-        MenuItem itemCerrarBoveda = new MenuItem("Cerrar bóveda...");
+        MenuItem itemCerrarBoveda = new MenuItem("Cerrar bóveda");
         itemCerrarBoveda.setOnAction(e -> controladorPrincipal.cerrarBoveda());
 
         MenuItem itemGuardarBoveda = new MenuItem("Guardar bóveda...");
@@ -31,7 +33,17 @@ public class VistaPrincipal {
         itemSalir.setOnAction(e -> controladorPrincipal.salirAplicacion());
 
         menuArchivo.getItems().addAll(itemCerrarBoveda, itemGuardarBoveda, itemSalir);
-        menu.getMenus().add(menuArchivo);
+
+        // Menú Bóveda
+        Menu menuBoveda = new Menu("Bóveda");
+
+        MenuItem itemCambiarPassword = new MenuItem("Cambiar contraseña maestra...");
+        itemCambiarPassword.setOnAction(e -> controladorPrincipal.cambiarPasswordMaestra());
+
+        menuBoveda.getItems().add(itemCambiarPassword);
+
+        menu.getMenus().addAll(menuArchivo, menuBoveda);
+
 
         TabPane panelPestanas = new TabPane();
 
@@ -50,7 +62,7 @@ public class VistaPrincipal {
         root.setTop(menu);
         root.setCenter(panelPestanas);
 
-        return new Scene(root,800, 600);
+        return new Scene(root,1000, 800);
 
 
     }

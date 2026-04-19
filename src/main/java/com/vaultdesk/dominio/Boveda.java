@@ -17,6 +17,8 @@ public class Boveda {
     private TemaVisual temaVisual;
     private List<Credencial> credenciales;
 
+    private boolean modificadaSinGuardar; // Flag para saber si hay cambios sin guardar
+
     // Constructor vacío
     public Boveda(){
     }
@@ -44,6 +46,8 @@ public class Boveda {
         else{
             this.credenciales = new ArrayList<>();
         }
+
+        this.modificadaSinGuardar = false; // Se inicializa a false, al crear la bóveda NO hay cambios sin guardar
     }
 
     public void setIdBoveda(int idBoveda){
@@ -102,9 +106,20 @@ public class Boveda {
         return this.credenciales;
     }
 
+    public boolean isModificadaSinGuardar(){
+        return modificadaSinGuardar;
+    }
+
+    public void setModificadaSinGuardar(boolean modificadaSinGuardar){
+        this.modificadaSinGuardar = modificadaSinGuardar;
+    }
+
+
     @Override
     public String toString(){
         return this.nombre;
     }
+
+
 
 }

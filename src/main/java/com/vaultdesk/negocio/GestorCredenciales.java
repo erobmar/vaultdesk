@@ -276,10 +276,10 @@ public class GestorCredenciales {
         String textoNormalizado = (textoBusqueda == null) ? "":textoBusqueda.trim();
 
         String sentenciaBusqueda = """
-                SELECT * FROM credencial 
-                where id_boveda = ? AND 
+                SELECT * FROM credencial
+                where id_boveda = ? AND
                 (
-                    url_identificador LIKE ? OR 
+                    url_identificador LIKE ? OR
                     username LIKE ? OR
                     anotaciones LIKE ?
                 )
