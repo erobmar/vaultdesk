@@ -641,4 +641,123 @@ public class GestorCredenciales {
 
     }
 
+
+    public void actualizarCredencial(Connection conexion, Boveda boveda, Credencial credencial) throws SQLException{
+
+        validarConexion(conexion);
+        validarBoveda(boveda.getIdBoveda());
+        validarCredencial(credencial);
+
+        if(credencial.getIdCredencial() <= 0){
+            throw new IllegalArgumentException("El id de credencial no es válido");
+        }
+
+        comprobarExisteCredencialEnBoveda(conexion, credencial.getIdCredencial(), boveda.getIdBoveda());
+
+        int idCategoria = 1; // Categoría por defecto
+
+        if(credencial.getCategoria() != null && credencial.getCategoria().getIdCategoria() > 0){
+            idCategoria = credencial.getCategoria().getIdCategoria();
+        }
+
+        String sentenciaActualizacion = """
+                UPDATE credencial
+                SET
+                    url_identificador = ?,
+                    username = ?,
+                    password = ?,
+                    destacada = ?,
+                    anotaciones = ?,
+                    caduca = ?,
+                    ultimo_update = ?,
+                    fecha_caducidad = ?,
+                    periodo_caducidad = ?,
+                    req_longitud = ?,
+                    req_mayusculas = ?,
+                    req_minusculas = ?,
+                    req_digitos = ?,
+                    req_especiales = ?,
+                    id_categoria = ?
+                WHERE id_credencial = ?
+                AND id_boveda = ?
+                """;
+
+        try (PreparedStatement sentencia = conexion.prepareStatement(sentenciaActualizacion)){
+
+            sentencia.setString(1, credencial.getUrlIdentificador());
+            sentencia.setString(2, credencial.getUsername());
+            sentencia.setString(3, credencial.getPassword());
+            sentencia.setInt(4, credencial.isDestacada() ? 1:0);
+            sentencia.setString(5, credencial.getAnotaciones());
+            sentencia.setInt(6 , credencial.isCaduca() ? 1:0);
+
+            if(credencial.getFechaUltimoUpdate() != null){
+                sentencia.setString(7, credencial.getFechaUltimoUpdate().toString() );
+            } else {
+                sentencia.setNull(7, Types.VARCHAR);
+            }
+
+            if(credencial.getFechaCaducidad() == null){
+                sentencia.setString(8 , credencial.getFechaCaducidad().toString());
+            } else {
+                sentencia.setNull(8, Types.VARCHAR);
+            }
+
+            if(credencial.getPeriodoCaducidad() >0 ){
+                sentencia.setInt(9, credencial.getPeriodoCaducidad());
+
+            } else {
+                sentencia.setNull(9, Types.INTEGER);
+            }
+
+            if(credencial.getReqLongitud() > 0){
+                sentencia.setInt(10, credencial.getReqLongitud());
+            } else {
+                sentencia.setNull(10, Types.INTEGER);
+            }
+
+            if(credencial.getReqMayusculas() > 0){
+                sentencia.setInt(11, credencial.getReqMayusculas());
+            } else {
+                sentencia.setNull(11, Types.INTEGER);
+            }
+            if(credencial.getReqMinusculas() > 0){
+                sentencia.setInt(12, credencial.getReqMinusculas());
+            } else {
+                sentencia.setNull(12, Types.INTEGER);
+            }
+            if(credencial.getReqDigitos() > 0){
+                sentencia.setInt(13, credencial.getReqDigitos());
+            } else {
+                sentencia.setNull(13, Types.INTEGER);
+            }
+            if(credencial.getReqEspeciales() > 0){
+                sentencia.setInt(14, credencial.getReqEspeciales());
+            } else {
+                sentencia.setNull(14, Types.INTEGER);
+            }
+
+            sentencia.setInt(15, idCategoria);
+            sentencia.setInt(16, credencial.getIdCredencial());
+            sentencia.setInt(17, boveda.getIdBoveda());
+
+            int filasActualizadas = sentencia.executeUpdate();
+
+            if(filasActualizadas == 0){
+                throw new SQLException("No se pudo actualizar la credencial");
+            }
+
+
+
+
+        }
+
+
+
+
+
+
+    }
+
+
 }

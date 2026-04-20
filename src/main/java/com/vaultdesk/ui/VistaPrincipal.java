@@ -44,10 +44,11 @@ public class VistaPrincipal {
 
         menu.getMenus().addAll(menuArchivo, menuBoveda);
 
+        VistaCredenciales vistaCredenciales = new VistaCredenciales(controladorPrincipal);
 
         TabPane panelPestanas = new TabPane();
 
-        Tab pestanaCredenciales = new Tab("Credenciales", new Label("Contenido de Credenciales"));
+        Tab pestanaCredenciales = new Tab("Credenciales", vistaCredenciales.crearContenido());
         Tab pestanaCategorias = new Tab("Categorias", new Label("Contenido de Categorias"));
         Tab pestanaGenerador = new Tab("Generador", new Label("Contenido de Generador de Contraseñas"));
         Tab pestanaAjustes = new Tab("Ajustss", new Label("Contenido de Ajustes del Sistema"));

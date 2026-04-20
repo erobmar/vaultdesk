@@ -1,7 +1,10 @@
 package com.vaultdesk.controlador;
 
 import com.vaultdesk.dominio.Boveda;
+import com.vaultdesk.dominio.Categoria;
+import com.vaultdesk.dominio.Credencial;
 import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
+import com.vaultdesk.negocio.GestorCredenciales;
 import com.vaultdesk.negocio.GestorRutasAplicacion;
 import com.vaultdesk.persistencia.GestorBaseDatos;
 import com.vaultdesk.persistencia.GestorPersistencia;
@@ -21,8 +24,11 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.IllformedLocaleException;
+import java.util.List;
+
 
 public class ControladorPrincipal {
 
@@ -391,6 +397,132 @@ public class ControladorPrincipal {
         return bovedaActual;
     }
 
+    public List<Credencial> obtenerCredenciales() throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        List<Credencial> credenciales = new ArrayList<>();
+
+        String sentenciaConsulta = """
+                SELECT
+                     id_credencial,
+                     url_identificador,
+                     username,
+                     password,
+                     destacada,
+                     anotaciones,
+                     caduca,
+                     ultimo_update,
+                     fecha_caducidad,
+                     periodo_caducidad,
+                     req_longitud,
+                     req_mayusculas,
+                     req_minusculas,
+                     req_digitos,
+                     req_especiales,
+                     id_categoria
+                FROM credencial
+                WHERE id_boveda = ?
+                ORDER BY username
+                """;
+
+        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
+
+            sentencia.setInt(1, bovedaActual.getIdBoveda());
+
+            try(ResultSet setResultados = sentencia.executeQuery()){
+                while(setResultados.next()){
+
+                    Credencial credencial = new Credencial();
+
+                    credencial.setIdCredencial(setResultados.getInt("id_credencial"));
+                    credencial.setUrlIdentificador(setResultados.getString("url_identificador"));
+                    credencial.setUsername(setResultados.getString("username"));
+                    credencial.setPassword(setResultados.getString("password"));
+                    credencial.setDestacada(setResultados.getInt("destacada") == 1);
+                    credencial.setAnotaciones(setResultados.getString("anotaciones"));
+                    credencial.setCaduca(setResultados.getInt("caduca") == 1);
+
+                    // El resto de campos son opcionales, hay que comprobarlos individualmente
+
+                    // Comprobación de fecha de actualización
+                    String ultimoUpdate = setResultados.getString("ultimo_update");
+
+                    if(ultimoUpdate != null){
+
+                        credencial.setFechaUltimoUpdate(LocalDate.parse(ultimoUpdate));
+                    }
+
+                    // Comprobación de fecha de caducidad
+                    String fechaCaducidad = setResultados.getString("fecha_caducidad");
+
+                    if(fechaCaducidad != null){
+
+                        credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad));
+                    }
+
+                    // Comprobación de periodo de caducidad
+                    int periodoCaducidad = setResultados.getInt("periodo_caducidad");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setPeriodoCaducidad(periodoCaducidad);
+                    }
+
+                    // Comprobación de requisito de longitud
+                    int reqLongitud = setResultados.getInt("req_longitud");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setReqLongitud(reqLongitud);
+                    }
+
+                    // Comprobación de requisito de mayúsculas
+                    int reqMayusculas = setResultados.getInt("req_mayusculas");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setReqMayusculas(reqMayusculas);
+                    }
+
+                    // Comprobación de requisito de minúsculas
+                    int reqMinusculas = setResultados.getInt("req_minusculas");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setReqMinusculas(reqMinusculas);
+                    }
+
+                    // Comprobación de requisito de dígitos
+                    int reqDigitos = setResultados.getInt("req_digitos");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setReqDigitos(reqDigitos);
+                    }
+
+                    // Comprobación de requisito de caracteres espciales
+                    int reqEspeciales = setResultados.getInt("req_especiales");
+
+                    if(!setResultados.wasNull()){
+
+                        credencial.setReqEspeciales(reqEspeciales);
+                    }
+
+                    credenciales.add(credencial);
+
+                }
+            }
+
+            return credenciales;
+        }
+
+
+    }
+
+
     private ButtonType mostrarConfirmacionCierre(){
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -407,5 +539,99 @@ public class ControladorPrincipal {
         return alert.showAndWait().orElse(botonCancelar);
 
     }
+
+    public void crearCredencial(
+            String urlIdentificador,
+            String username,
+            String password,
+            int idCategoria
+            ) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay una bóveda abierta");
+        }
+
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda activa");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+
+
+        Credencial credencial = new Credencial();
+        Categoria categoria = new Categoria();
+
+        categoria.setIdCategoria(idCategoria);
+
+        credencial.setUrlIdentificador(urlIdentificador);
+        credencial.setUsername(username);
+        credencial.setPassword(password);
+        credencial.setCategoria(categoria);
+
+        credencial.setDestacada(false);
+        credencial.setAnotaciones(null);
+        credencial.setCaduca(false);
+        credencial.setFechaCaducidad(null);
+        credencial.setPeriodoCaducidad(0);
+        credencial.setFechaUltimoUpdate(null);
+
+        credencial.setReqLongitud(0);
+        credencial.setReqMayusculas(0);
+        credencial.setReqMinusculas(0);
+        credencial.setReqDigitos(0);
+        credencial.setReqEspeciales(0);
+
+        gestorCredenciales.crearCredencial(credencial, bovedaActual.getIdBoveda(), conexionActual);
+
+        bovedaActual.setModificadaSinGuardar(true);
+
+    }
+
+
+    public void editarCredencial(
+            int idCredencial,
+            String urlIdentificador,
+            String username,
+            String password,
+            int idCategoria
+    ) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda activa");
+        }
+
+        Credencial credencial = new Credencial();
+
+        credencial.setIdCredencial(idCredencial);
+        credencial.setUrlIdentificador(urlIdentificador);
+        credencial.setUsername(username);
+        credencial.setPassword(password);
+        credencial.setDestacada(false);
+        credencial.setAnotaciones(null);
+        credencial.setCaduca(false);
+        credencial.setFechaCaducidad(null);
+        credencial.setFechaUltimoUpdate(null);
+        credencial.setPeriodoCaducidad(0);
+        credencial.setReqLongitud(0);
+        credencial.setReqMayusculas(0);
+        credencial.setReqMinusculas(0);
+        credencial.setReqDigitos(0);
+        credencial.setReqEspeciales(0);
+
+        Categoria categoria = new Categoria();
+        categoria.setIdCategoria(1);
+
+        credencial.setCategoria(categoria);
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+        gestorCredenciales.actualizarCredencial(conexionActual, bovedaActual, credencial);
+
+        bovedaActual.setModificadaSinGuardar(true);
+    }
+
+
 
 }
