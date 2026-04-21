@@ -545,6 +545,16 @@ public class ControladorPrincipal {
             String urlIdentificador,
             String username,
             String password,
+            boolean destacada,
+            String anotaciones,
+            boolean caduca,
+            String fechaCaducidad,
+            int periodoCaducidad,
+            int reqLongitud,
+            int reqMayusculas,
+            int reqMinusculas,
+            int reqDigitos,
+            int reqEspeciales,
             int idCategoria
             ) throws Exception{
 
@@ -560,27 +570,40 @@ public class ControladorPrincipal {
 
 
         Credencial credencial = new Credencial();
-        Categoria categoria = new Categoria();
 
-        categoria.setIdCategoria(idCategoria);
+
 
         credencial.setUrlIdentificador(urlIdentificador);
         credencial.setUsername(username);
         credencial.setPassword(password);
+        credencial.setDestacada(destacada);
+        credencial.setAnotaciones(anotaciones == null || anotaciones.isBlank() ? null : anotaciones.trim());
+        credencial.setCaduca(caduca);
+
+        if(caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()){
+            credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad.trim()));
+        } else {
+            credencial.setFechaCaducidad(null);
+        }
+
+        credencial.setPeriodoCaducidad(Math.max(periodoCaducidad, 0));
+
+        if(caduca && periodoCaducidad > 0){
+            credencial.setFechaUltimoUpdate(LocalDate.now());
+        } else {
+            credencial.setFechaUltimoUpdate(null);
+        }
+
+        credencial.setReqLongitud(Math.max(reqLongitud, 0));
+        credencial.setReqMayusculas(Math.max(reqMayusculas, 0));
+        credencial.setReqMinusculas(Math.max(reqMinusculas, 0));
+        credencial.setReqDigitos(Math.max(reqDigitos, 0));
+        credencial.setReqEspeciales(Math.max(reqEspeciales, 0));
+
+        Categoria categoria = new Categoria();
+
+        categoria.setIdCategoria(idCategoria);
         credencial.setCategoria(categoria);
-
-        credencial.setDestacada(false);
-        credencial.setAnotaciones(null);
-        credencial.setCaduca(false);
-        credencial.setFechaCaducidad(null);
-        credencial.setPeriodoCaducidad(0);
-        credencial.setFechaUltimoUpdate(null);
-
-        credencial.setReqLongitud(0);
-        credencial.setReqMayusculas(0);
-        credencial.setReqMinusculas(0);
-        credencial.setReqDigitos(0);
-        credencial.setReqEspeciales(0);
 
         gestorCredenciales.crearCredencial(credencial, bovedaActual.getIdBoveda(), conexionActual);
 
@@ -594,6 +617,16 @@ public class ControladorPrincipal {
             String urlIdentificador,
             String username,
             String password,
+            boolean destacada,
+            String anotaciones,
+            boolean caduca,
+            String fechaCaducidad,
+            int periodoCaducidad,
+            int reqLongitud,
+            int reqMayusculas,
+            int reqMinusculas,
+            int reqDigitos,
+            int reqEspeciales,
             int idCategoria
     ) throws Exception{
 
@@ -610,21 +643,32 @@ public class ControladorPrincipal {
         credencial.setUrlIdentificador(urlIdentificador);
         credencial.setUsername(username);
         credencial.setPassword(password);
-        credencial.setDestacada(false);
-        credencial.setAnotaciones(null);
-        credencial.setCaduca(false);
-        credencial.setFechaCaducidad(null);
-        credencial.setFechaUltimoUpdate(null);
-        credencial.setPeriodoCaducidad(0);
-        credencial.setReqLongitud(0);
-        credencial.setReqMayusculas(0);
-        credencial.setReqMinusculas(0);
-        credencial.setReqDigitos(0);
-        credencial.setReqEspeciales(0);
+        credencial.setDestacada(destacada);
+        credencial.setAnotaciones(anotaciones == null || anotaciones.isBlank() ? null : anotaciones.trim());
+        credencial.setCaduca(caduca);
+
+        if(caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()){
+            credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad.trim()));
+        } else {
+            credencial.setFechaCaducidad(null);
+        }
+
+        credencial.setPeriodoCaducidad(periodoCaducidad);
+
+        if(caduca && periodoCaducidad > 0){
+            credencial.setFechaUltimoUpdate(LocalDate.now());
+        } else {
+            credencial.setFechaUltimoUpdate(null);
+        }
+
+        credencial.setReqLongitud(Math.max(reqLongitud, 0));
+        credencial.setReqMayusculas(Math.max(reqMayusculas, 0));
+        credencial.setReqMinusculas(Math.max(reqMinusculas, 0));
+        credencial.setReqDigitos(Math.max(reqDigitos, 0));
+        credencial.setReqEspeciales(Math.max(reqEspeciales, 0));
 
         Categoria categoria = new Categoria();
-        categoria.setIdCategoria(1);
-
+        categoria.setIdCategoria(idCategoria);
         credencial.setCategoria(categoria);
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
