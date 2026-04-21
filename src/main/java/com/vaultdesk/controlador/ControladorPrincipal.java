@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 public class ControladorPrincipal {
@@ -632,6 +633,36 @@ public class ControladorPrincipal {
         bovedaActual.setModificadaSinGuardar(true);
     }
 
+    public void eliminarCredencial(Credencial credencial) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No existe ninguna bóveda abierta");
+        }
+
+        if(bovedaActual == null){
+            throw new IllegalStateException("No existe ninguna bóveda abierta");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+
+        gestorCredenciales.eliminarCredencial(conexionActual, bovedaActual.getIdBoveda(), credencial);
+
+        bovedaActual.setModificadaSinGuardar(true);
+
+    }
+
+    public boolean confirmarEliminacionCredencial(){
+
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Eliminar credencial");
+        alerta.setHeaderText("Vas a eliminar una credencial");
+        alerta.setContentText("¿Estás seguro de que quieres continuar?");
+
+        Optional<ButtonType> resultado = alerta.showAndWait();
+
+        return resultado.isPresent() && resultado.get() == ButtonType.OK;
+
+    }
 
 
 }

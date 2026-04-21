@@ -58,6 +58,7 @@ public class VistaCredenciales {
         // Sección para botón de 'Nueva credencial' - "Editar credencial"
         Button botonNuevaCredencial = new Button("Nueva...");
         Button botonEditarCredencial = new Button("Editar...");
+        Button botonEliminarCredencial = new Button("Eliminar");
 
         botonNuevaCredencial.setOnAction(e->{
 
@@ -118,9 +119,38 @@ public class VistaCredenciales {
         });
 
 
+        botonEliminarCredencial.setOnAction(e->{
+
+            Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
+
+            if(seleccionada == null){
+
+                return;
+            }
+
+            boolean confirmado = controladorPrincipal.confirmarEliminacionCredencial();
+
+            if(!confirmado){
+                return;
+            }
+
+            try{
+                controladorPrincipal.eliminarCredencial(seleccionada);
+
+                List<Credencial> credencialesActualizadas = controladorPrincipal.obtenerCredenciales();
+                tablaCredenciales.setItems(FXCollections.observableArrayList(credencialesActualizadas));
+            } catch (Exception ex) {
+
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
 
 
-        HBox barraSuperior = new HBox(10, botonNuevaCredencial, botonEditarCredencial);
+        });
+
+
+
+        HBox barraSuperior = new HBox(10, botonNuevaCredencial, botonEditarCredencial, botonEliminarCredencial);
 
 
         try{

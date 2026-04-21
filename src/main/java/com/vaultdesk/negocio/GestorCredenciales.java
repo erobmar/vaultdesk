@@ -697,7 +697,7 @@ public class GestorCredenciales {
                 sentencia.setNull(7, Types.VARCHAR);
             }
 
-            if(credencial.getFechaCaducidad() == null){
+            if(credencial.getFechaCaducidad() != null){
                 sentencia.setString(8 , credencial.getFechaCaducidad().toString());
             } else {
                 sentencia.setNull(8, Types.VARCHAR);

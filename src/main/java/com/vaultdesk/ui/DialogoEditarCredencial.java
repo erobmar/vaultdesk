@@ -44,14 +44,14 @@ public class DialogoEditarCredencial {
         botonAceptar.setOnAction(e-> {
 
             String url = campoUrl.getText() == null ? "" : campoUrl.getText().trim();
-            String usermane = campoPassword.getText() == null ? "" : campoUsername.getText().trim();
+            String username = campoPassword.getText() == null ? "" : campoUsername.getText().trim();
             String password = campoPassword.getText();
 
             if(url.isEmpty()){
                 etiquetaError.setText("Debes especificar una URL o Identificador de sistema");
                 return;
             }
-            if(usermane.isEmpty()){
+            if(username.isEmpty()){
                 etiquetaError.setText("Debes especificar un nombre de usuario");
                 return;
             }
@@ -60,12 +60,13 @@ public class DialogoEditarCredencial {
                 return;
             }
 
-            callback.accept(new DatosEdicionCredencial(credencial.getIdCredencial(), url, usermane, password, 1));
-
             dialogo.close();
+            callback.accept(new DatosEdicionCredencial(credencial.getIdCredencial(), url, username, password, 1));
+
+
         });
 
-        botonAceptar.setOnAction(e->{
+        botonCancelar.setOnAction(e->{
             callback.accept(null);
             return;
         });
