@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GestorCategorias {
 
@@ -298,5 +300,50 @@ public class GestorCategorias {
 
 
     }
+
+
+    public List<Categoria> obtenerCategorias(Connection conexion) throws Exception{
+
+        List<Categoria> listaCategorias = new ArrayList<>();
+
+        validarConexion(conexion);
+
+        String sentenciaObtencion = """
+                SELECT id_categoria, nombre, descripcion, es_del_sistema
+                FROM categoria
+                ORDER BY es_del_sistema DESC, nombre ASC
+                """;
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaObtencion)){
+
+            ResultSet setResultados = sentencia.executeQuery();
+
+            while(setResultados.next()){
+
+                Categoria categoria = new Categoria();
+
+                categoria.setIdCategoria(setResultados.getInt("id_categoria"));
+                categoria.setNombre(setResultados.getString("nombre"));
+                categoria.setDescripcion(setResultados.getString("descripcion"));
+                categoria.setEsDelSistema(setResultados.getInt("es_del_sistema") == 1);
+
+                listaCategorias.add(categoria);
+            }
+
+        }
+        return listaCategorias;
+    }
+
+
+    public record DatosNuevaCategoria(
+            String nombre,
+            String descripcion
+    ){}
+
+    public record DatosEdicionCategoria(
+            int idCategoria,
+            String nombre,
+            String descripcion
+    ){}
 
 }

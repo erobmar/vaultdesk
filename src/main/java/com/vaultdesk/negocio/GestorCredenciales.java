@@ -273,16 +273,44 @@ public class GestorCredenciales {
 
         comprobarExisteBoveda(conexion, idBoveda);
 
-        String textoNormalizado = (textoBusqueda == null) ? "":textoBusqueda.trim();
+        String textoNormalizado = textoBusqueda == null ? "" : textoBusqueda.trim();
+
+        if(textoNormalizado.isEmpty()){
+            return obtenerCredencialesDeBoveda(conexion, idBoveda);
+        }
+
 
         String sentenciaBusqueda = """
-                SELECT * FROM credencial
-                where id_boveda = ? AND
-                (
-                    url_identificador LIKE ? OR
-                    username LIKE ? OR
-                    anotaciones LIKE ?
+                SELECT
+                    c.id_credencial,
+                    c.url_identificador,
+                    c.username,
+                    c.password,
+                    c.destacada,
+                    c.anotaciones,
+                    c.caduca,
+                    c.fecha_caducidad,
+                    c.periodo_caducidad,
+                    c.ultimo_update,
+                    c.req_longitud,
+                    c.req_mayusculas,
+                    c.req_minusculas,
+                    c.req_digitos,
+                    c.req_especiales,
+                    c.id_categoria,
+                    cat.nombre AS nombre_categoria,
+                    cat.descripcion AS descripcion_categoria,
+                    cat.es_del_sistema
+                FROM credencial c
+                JOIN categoria cat ON c.id_categoria = cat.id_categoria
+                WHERE id_boveda = ?
+                AND(
+                    LOWER(c.url_identificador) LIKE ?
+                    OR LOWER(c.username) LIKE ?
+                    OR LOWER(COALESCE(c.anotaciones, '')) LIKE ?
+                    OR LOWER(cat.nombre) LIKE ?
                 )
+                ORDER BY c.username
                 """;
 
         List<Credencial> resultados = new ArrayList<>();
@@ -295,6 +323,7 @@ public class GestorCredenciales {
             sentencia.setString(2, patronBusqueda);
             sentencia.setString(3, patronBusqueda);
             sentencia.setString(4, patronBusqueda);
+            sentencia.setString(5, patronBusqueda);
 
             try(ResultSet setResultados = sentencia.executeQuery()){
 
@@ -466,6 +495,14 @@ public class GestorCredenciales {
         credencial.setReqMinusculas(setReultados.getInt("req_minusculas"));
         credencial.setReqDigitos(setReultados.getInt("req_digitos"));
         credencial.setReqEspeciales(setReultados.getInt("req_especiales"));
+
+        Categoria categoria = new Categoria();
+        categoria.setIdCategoria(setReultados.getInt("id_categoria"));
+        categoria.setNombre(setReultados.getString("nombre_categoria"));
+        categoria.setDescripcion(setReultados.getString("descripcion_categoria"));
+        categoria.setEsDelSistema(setReultados.getInt("es_del_sistema") == 1);
+
+        credencial.setCategoria(categoria);
 
         return credencial;
     }
@@ -759,5 +796,51 @@ public class GestorCredenciales {
 
     }
 
+
+    private List<Credencial> obtenerCredencialesDeBoveda(Connection conexion, int idBoveda) throws SQLException{
+
+        String sentenciaConsulta = """
+                SELECT
+                    c.id_credencial,
+                    c.url_identificador,
+                    c.username,
+                    c.password,
+                    c.destacada,
+                    c.anotaciones,
+                    c.caduca,
+                    c.fecha_caducidad,
+                    c.periodo_caducidad,
+                    c.ultimo_update,
+                    c.req_longitud,
+                    c.req_mayusculas,
+                    c.req_minusculas,
+                    c.req_digitos,
+                    c.req_especiales,
+                    c.id_categoria,
+                    cat.nombre AS nombre_categoria,
+                    cat.descripcion AS descripcion_categoria,
+                    cat.es_del_sistema
+                FROM credencial c
+                JOIN categoria cat ON c.id_categoria = cat.id_categoria
+                WHERE c.id_boveda = ?
+                ORDER BY c.username
+                """;
+
+        List<Credencial> credenciales = new ArrayList<>();
+        try (PreparedStatement sentencia = conexion.prepareStatement(sentenciaConsulta)){
+
+            sentencia.setInt(1, idBoveda);
+
+            try(ResultSet setResultados = sentencia.executeQuery()){
+                while (setResultados.next()){
+                    credenciales.add(mapearCredencial(setResultados));
+                }
+            }
+
+
+        }
+
+        return credenciales;
+    }
 
 }

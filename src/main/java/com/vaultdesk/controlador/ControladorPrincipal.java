@@ -4,6 +4,7 @@ import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
 import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
+import com.vaultdesk.negocio.GestorCategorias;
 import com.vaultdesk.negocio.GestorCredenciales;
 import com.vaultdesk.negocio.GestorRutasAplicacion;
 import com.vaultdesk.persistencia.GestorBaseDatos;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +38,7 @@ public class ControladorPrincipal {
     private final Stage primaryStage;
     private final GestorPersistencia gestorPersistencia;
     private final GestorBaseDatos gestorBaseDatos;
+    private final GestorCategorias gestorCategorias;
 
     private Boveda bovedaActual;
 
@@ -48,6 +51,7 @@ public class ControladorPrincipal {
         this.primaryStage = primaryStage;
         this.gestorPersistencia = new GestorPersistencia();
         this.gestorBaseDatos = new GestorBaseDatos();
+        this.gestorCategorias = new GestorCategorias();
     }
 
     public void mostrarVistaInicial(){
@@ -63,20 +67,30 @@ public class ControladorPrincipal {
 
         VistaPrincipal vistaPrincipal = new VistaPrincipal(this);
 
+
+        primaryStage.setScene(vistaPrincipal.crearEscena());
+        actualizarTituloVentana();
+        primaryStage.show();
+    }
+
+    public void actualizarTituloVentana(){
+
         String titulo = "VaultDesk";
 
-        if(bovedaActual != null){
+        if(bovedaActual != null) {
             titulo += " - " + bovedaActual.getNombre();
-            if(bovedaActual.isModificadaSinGuardar()){
-                titulo += " *";
+
+            if (bovedaActual.isModificadaSinGuardar()) {
+                titulo += " (*)";
             }
-        }else if(rutaBoveda != null){
+        } else if(rutaBoveda != null){
+
             titulo += " - " + rutaBoveda.getFileName();
         }
 
         primaryStage.setTitle(titulo);
-        primaryStage.setScene(vistaPrincipal.crearEscena());
-        primaryStage.show();
+
+
     }
 
 
@@ -187,7 +201,7 @@ public class ControladorPrincipal {
             }
 
 
-            if(conexionActual == null && !conexionActual.isClosed()){
+            if(conexionActual != null && !conexionActual.isClosed()){
                 conexionActual.close();
             }
         } catch (Exception e){
@@ -224,6 +238,7 @@ public class ControladorPrincipal {
 
                 if(bovedaActual != null){
                     bovedaActual.setModificadaSinGuardar(false);
+                    actualizarTituloVentana();
                 }
 
             } catch (Exception e){
@@ -408,25 +423,29 @@ public class ControladorPrincipal {
 
         String sentenciaConsulta = """
                 SELECT
-                     id_credencial,
-                     url_identificador,
-                     username,
-                     password,
-                     destacada,
-                     anotaciones,
-                     caduca,
-                     ultimo_update,
-                     fecha_caducidad,
-                     periodo_caducidad,
-                     req_longitud,
-                     req_mayusculas,
-                     req_minusculas,
-                     req_digitos,
-                     req_especiales,
-                     id_categoria
-                FROM credencial
-                WHERE id_boveda = ?
-                ORDER BY username
+                     c.id_credencial,
+                     c.url_identificador,
+                     c.username,
+                     c.password,
+                     c.destacada,
+                     c.anotaciones,
+                     c.caduca,
+                     c.ultimo_update,
+                     c.fecha_caducidad,
+                     c.periodo_caducidad,
+                     c.req_longitud,
+                     c.req_mayusculas,
+                     c.req_minusculas,
+                     c.req_digitos,
+                     c.req_especiales,
+                     c.id_categoria,
+                     cat.nombre AS nombre_categoria,
+                     cat.descripcion AS descripcion_categoria,
+                     cat.es_del_sistema
+                FROM credencial c
+                JOIN categoria cat ON c.id_categoria = cat.id_categoria
+                WHERE c.id_boveda = ?
+                ORDER BY c.username
                 """;
 
         try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
@@ -511,6 +530,14 @@ public class ControladorPrincipal {
 
                         credencial.setReqEspeciales(reqEspeciales);
                     }
+
+                    // Comprobación para categoría
+                    Categoria categoria = new Categoria();
+                    categoria.setIdCategoria(setResultados.getInt("id_categoria"));
+                    categoria.setNombre(setResultados.getString("nombre_categoria"));
+                    categoria.setDescripcion(setResultados.getString("descripcion_categoria"));
+                    categoria.setEsDelSistema(setResultados.getInt("es_del_sistema") == 1);
+                    credencial.setCategoria(categoria);
 
                     credenciales.add(credencial);
 
@@ -608,6 +635,7 @@ public class ControladorPrincipal {
         gestorCredenciales.crearCredencial(credencial, bovedaActual.getIdBoveda(), conexionActual);
 
         bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
 
     }
 
@@ -675,6 +703,7 @@ public class ControladorPrincipal {
         gestorCredenciales.actualizarCredencial(conexionActual, bovedaActual, credencial);
 
         bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
     }
 
     public void eliminarCredencial(Credencial credencial) throws Exception{
@@ -692,6 +721,7 @@ public class ControladorPrincipal {
         gestorCredenciales.eliminarCredencial(conexionActual, bovedaActual.getIdBoveda(), credencial);
 
         bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
 
     }
 
@@ -708,5 +738,100 @@ public class ControladorPrincipal {
 
     }
 
+
+    public List<Categoria> obtenerCategorias() throws SQLException {
+
+        if(conexionActual==null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+
+        try {
+            return gestorCategorias.obtenerCategorias(conexionActual);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener categorías", e);
+        }
+
+    }
+
+    public void crearCategoria(String nombre, String descripcion) throws SQLException {
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        Categoria categoria = new Categoria();
+        categoria.setNombre(nombre);
+        categoria.setDescripcion(descripcion);
+        categoria.setEsDelSistema(false);
+
+        gestorCategorias.crearCategoria(conexionActual, categoria);
+        bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
+
+    }
+
+    public void editarCategoria(int idCategoria, String nombre, String descripcion) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión abierta");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        Categoria categoria = new Categoria();
+        categoria.setIdCategoria(idCategoria);
+        categoria.setNombre(nombre);
+        categoria.setDescripcion(descripcion);
+
+        gestorCategorias.editarCategoria(conexionActual, categoria);
+        bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
+
+    }
+
+    public void eliminarCategoria(Categoria categoria) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        gestorCategorias.eliminarCategoria(conexionActual, categoria.getIdCategoria());
+        bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
+    }
+
+    public boolean confirmarEliminacionCategoria(Categoria categoria){
+
+        Alert alerta  = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Eliminar categoría");
+        alerta.setHeaderText("Va a eliminar la categoría " + categoria.getNombre());
+        alerta.setContentText("Las credenciales asignadas se reasignarán a 'Otros'. ¿Desea continuar?");
+
+        Optional<ButtonType> respuesta = alerta.showAndWait();
+
+        return respuesta.isPresent() && respuesta.get() == ButtonType.OK;
+    }
+
+    public List<Credencial> buscarCredencial(String textoBusqueda) throws Exception{
+
+        if (conexionActual==null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda activa");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+
+        return gestorCredenciales.buscarCredenciales(conexionActual, bovedaActual.getIdBoveda(), textoBusqueda);
+
+
+    }
 
 }

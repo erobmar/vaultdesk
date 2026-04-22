@@ -45,13 +45,14 @@ public class VistaPrincipal {
         menu.getMenus().addAll(menuArchivo, menuBoveda);
 
         VistaCredenciales vistaCredenciales = new VistaCredenciales(controladorPrincipal);
+        VistaCategorias vistaCategorias = new VistaCategorias(controladorPrincipal);
 
         TabPane panelPestanas = new TabPane();
 
         Tab pestanaCredenciales = new Tab("Credenciales", vistaCredenciales.crearContenido());
-        Tab pestanaCategorias = new Tab("Categorias", new Label("Contenido de Categorias"));
+        Tab pestanaCategorias = new Tab("Categorias", vistaCategorias.crearContenido());
         Tab pestanaGenerador = new Tab("Generador", new Label("Contenido de Generador de Contraseñas"));
-        Tab pestanaAjustes = new Tab("Ajustss", new Label("Contenido de Ajustes del Sistema"));
+        Tab pestanaAjustes = new Tab("Ajustes", new Label("Contenido de Ajustes del Sistema"));
 
         pestanaCredenciales.setClosable(false);
         pestanaCategorias.setClosable(false);
@@ -60,10 +61,11 @@ public class VistaPrincipal {
 
         panelPestanas.getTabs().addAll(pestanaCredenciales, pestanaCategorias, pestanaGenerador, pestanaAjustes);
 
+
         root.setTop(menu);
         root.setCenter(panelPestanas);
 
-        return new Scene(root,1000, 800);
+        return new Scene(root,1000, 1000);
 
 
     }

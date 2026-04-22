@@ -1,6 +1,8 @@
 package com.vaultdesk.ui;
 
+import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -10,6 +12,8 @@ import javafx.stage.Stage;
 import org.w3c.dom.Text;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class DialogoEditarCredencial {
@@ -20,7 +24,7 @@ public class DialogoEditarCredencial {
         this.owner = owner;
     }
 
-    public void mostrar(Credencial credencial, Consumer<DatosEdicionCredencial> callback){
+    public void mostrar(Credencial credencial, List<Categoria> listaCategorias, Consumer<DatosEdicionCredencial> callback){
 
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
@@ -31,6 +35,21 @@ public class DialogoEditarCredencial {
         TextField campoUsername = new TextField(credencial.getUsername());
         PasswordField campoPassword = new PasswordField();
         campoPassword.setText(credencial.getPassword());
+
+        ComboBox<Categoria> comboBoxCategoria = new ComboBox<>();
+        comboBoxCategoria.setItems(FXCollections.observableArrayList(listaCategorias));
+
+        if(credencial.getCategoria() != null){
+            int idCategoriaActual = credencial.getCategoria().getIdCategoria();
+
+            listaCategorias.stream()
+                    .filter(c -> c.getIdCategoria() == idCategoriaActual)
+                    .findFirst()
+                    .ifPresent(c -> comboBoxCategoria.getSelectionModel().select(c));
+        }
+        if(comboBoxCategoria.getValue() == null && !listaCategorias.isEmpty()){
+            comboBoxCategoria.getSelectionModel().selectFirst();
+        }
 
         CheckBox checkBoxDestacada = new CheckBox("Destacada");
         checkBoxDestacada.setSelected(credencial.isDestacada());
@@ -59,8 +78,9 @@ public class DialogoEditarCredencial {
             try {
 
                 String url = campoUrl.getText() == null ? "" : campoUrl.getText().trim();
-                String username = campoPassword.getText() == null ? "" : campoUsername.getText().trim();
+                String username = campoUsername.getText() == null ? "" : campoUsername.getText().trim();
                 String password = campoPassword.getText();
+                Categoria categoriaSeleccionada = comboBoxCategoria.getValue();
 
                 if (url.isEmpty()) {
                     etiquetaError.setText("Debes especificar una URL o Identificador de sistema");
@@ -72,6 +92,10 @@ public class DialogoEditarCredencial {
                 }
                 if (password == null || password.isEmpty()) {
                     etiquetaError.setText("Debes indicar una contraseña");
+                    return;
+                }
+                if(categoriaSeleccionada == null){
+                    etiquetaError.setText("Debes seleccionar una categoría");
                     return;
                 }
 
@@ -90,7 +114,7 @@ public class DialogoEditarCredencial {
                         parseEntero(campoReqMinusculas.getText()),
                         parseEntero(campoReqDigitos.getText()),
                         parseEntero(campoReqEspeciales.getText()),
-                        1
+                        categoriaSeleccionada.getIdCategoria()
                 );
 
                 dialogo.close();
@@ -122,6 +146,9 @@ public class DialogoEditarCredencial {
 
         parrilla.add(new Label("Password"), 0, fila);
         parrilla.add(campoPassword, 1,fila++);
+
+        parrilla.add(new Label("Categoría"), 0, fila);
+        parrilla.add(comboBoxCategoria, 1, fila++);
 
         parrilla.add(new Label("Destacada"), 0, fila);
         parrilla.add(checkBoxDestacada, 1, fila++);
@@ -162,6 +189,10 @@ public class DialogoEditarCredencial {
 
     }
 
+    private void cargarCategorias(){
+        List<Categoria> listaCategorias = new ArrayList<>();
+
+    }
 
     private int parseEntero(String texto){
         if(texto == null || texto.isBlank()){

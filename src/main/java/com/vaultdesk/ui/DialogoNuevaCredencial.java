@@ -1,5 +1,8 @@
 package com.vaultdesk.ui;
 
+import com.vaultdesk.dominio.Categoria;
+import com.vaultdesk.negocio.GestorCategorias;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -8,6 +11,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.w3c.dom.Text;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class DialogoNuevaCredencial {
@@ -18,7 +22,7 @@ public class DialogoNuevaCredencial {
         this.owner = owner;
     }
 
-    public void mostrar(Consumer<DatosNuevaCredencial> callback){
+    public void mostrar(List<Categoria> listaCategorias, Consumer<DatosNuevaCredencial> callback){
 
         Stage dialogo = new Stage();
 
@@ -54,6 +58,22 @@ public class DialogoNuevaCredencial {
         campoReqDigitos.setPromptText("0");
         campoReqEspeciales.setPromptText("0");
 
+        // Rutina para mostrar las categorías como lista
+        ComboBox<Categoria> comboBoxCategoria = new ComboBox<>();
+        comboBoxCategoria.setItems(FXCollections.observableArrayList(listaCategorias));
+
+        Categoria categoriaOtros = listaCategorias.stream()
+                .filter(c -> c.getIdCategoria() == GestorCategorias.ID_CATEGORIA_OTROS)
+                .findFirst()
+                .orElse(null);
+
+        if(categoriaOtros != null){
+            comboBoxCategoria.getSelectionModel().selectFirst();
+        } else if(!listaCategorias.isEmpty()){
+            comboBoxCategoria.getSelectionModel().selectFirst();
+        }
+
+
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red;");
 
@@ -67,6 +87,7 @@ public class DialogoNuevaCredencial {
                 String urlIdentificador = campoUrlIdentificador.getText() == null ? "" : campoUrlIdentificador.getText().trim();
                 String username = campoUsername.getText() == null ? "" : campoUsername.getText().trim();
                 String password = campoPassword.getText();
+                Categoria categoriaSeleccionada = comboBoxCategoria.getValue();
 
                 if (urlIdentificador.isEmpty()) {
                     etiquetaError.setText("Debes indicar una URL o identificador de sistema");
@@ -97,7 +118,7 @@ public class DialogoNuevaCredencial {
                         parseEntero(campoReqMinusculas.getText()),
                         parseEntero(campoReqDigitos.getText()),
                         parseEntero(campoReqEspeciales.getText()),
-                        1
+                        categoriaSeleccionada.getIdCategoria()
                 )); // Por defecto se adjudica a la categoría 'Otros'
                 dialogo.close();
             } catch (NumberFormatException ex){
@@ -126,6 +147,9 @@ public class DialogoNuevaCredencial {
 
         parrilla.add(new Label("Contraseña"), 0, fila);
         parrilla.add(campoPassword, 1, fila++);
+
+        parrilla.add(new Label("Categoria"), 0, fila);
+        parrilla.add(comboBoxCategoria, 1, fila++);
 
         parrilla.add(new Label("Destacada"), 0, fila);
         parrilla.add(checkBoxDestacada, 1, fila++);

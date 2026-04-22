@@ -1,21 +1,29 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VistaCredenciales {
 
     private final ControladorPrincipal controladorPrincipal;
+
+    private TableView<Credencial> tablaCredenciales;
+
+    private BorderPane root;
 
     private Integer idCredencialVisible = null;
 
@@ -26,9 +34,9 @@ public class VistaCredenciales {
 
     public BorderPane crearContenido(){
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
 
-        TableView<Credencial> tablaCredenciales = new TableView<>();
+        tablaCredenciales = new TableView<>();
 
         TableColumn<Credencial, Number> columnaID = new TableColumn<>("ID");
         TableColumn<Credencial, String> columnaUsername = new TableColumn<>("Username");
@@ -44,6 +52,9 @@ public class VistaCredenciales {
         TableColumn<Credencial, String> columnaReqMinusculas = new TableColumn<>("Minúsculasas requeridas");
         TableColumn<Credencial, String> columnaReqDigitos = new TableColumn<>("Dígitos requeridos");
         TableColumn<Credencial, String> columnaReqEspeciales = new TableColumn<>("Caracteres especiales requeridos");
+        TableColumn<Credencial, String> columnaCategoria = new TableColumn<>("Categoría");
+
+
 
         columnaID.setCellValueFactory(datos ->
             new ReadOnlyObjectWrapper<>(datos.getValue().getIdCredencial())
@@ -109,16 +120,15 @@ public class VistaCredenciales {
                         datos.getValue().getAnotaciones() == null ? "" : datos.getValue().getAnotaciones()
                 ));
 
-
-
-
-
-
-
+        columnaCategoria.setCellValueFactory(datos ->
+                new ReadOnlyObjectWrapper<>(
+                        datos.getValue().getCategoria() == null ? "" : datos.getValue().getCategoria().getNombre()
+                ));
 
         tablaCredenciales.getColumns().addAll(
                 columnaID,
                 columnaUrlIdentificador,
+                columnaCategoria,
                 columnaUsername,
                 columnaPassword,
                 columnaDestacada,
@@ -135,6 +145,7 @@ public class VistaCredenciales {
 
         columnaID.setPrefWidth(70);
         columnaUrlIdentificador.setPrefWidth(220);
+        columnaCategoria.setPrefWidth(120);
         columnaUsername.setPrefWidth(160);
         columnaPassword.setPrefWidth(160);
         columnaDestacada.setPrefWidth(80);
@@ -153,17 +164,34 @@ public class VistaCredenciales {
         Button botonEditarCredencial = new Button("Editar...");
         Button botonEliminarCredencial = new Button("Eliminar");
         Button botonTogglePassword = new Button("Mostrar/Ocultar password");
+        Button botonCopiarPassword = new Button("Copiar password");
+        botonCopiarPassword.setDisable(true);
+
+        // Sección de búsqueda
+        TextField campoBusqueda = new TextField("Buscar credenciales...");
+
+        Button botonBuscar = new Button("Buscar");
+        Button botonLimpiarBusqueda = new Button("Limpiar búsqueda");
+
+
 
         botonNuevaCredencial.setOnAction(e->{
 
             DialogoNuevaCredencial dialogo = new DialogoNuevaCredencial((Stage) root.getScene().getWindow()); // TODO - Documentar
 
-            dialogo.mostrar(datos ->{
+            try {
 
-                    if(datos == null){
+                List<Categoria> listaCategorias = controladorPrincipal.obtenerCategorias();
+
+                dialogo.mostrar(listaCategorias, datos -> {
+
+                    if (datos == null) {
                         return;
                     }
-                    try{
+                    try {
+
+
+
                         controladorPrincipal.crearCredencial(
                                 datos.urlIdentificador(),
                                 datos.username(),
@@ -182,12 +210,17 @@ public class VistaCredenciales {
                         );
 
                         refrescarTabla(tablaCredenciales);
+                        botonCopiarPassword.setDisable(true);
 
-                    } catch (Exception excepcion){
+                    } catch (Exception excepcion) {
                         excepcion.printStackTrace();
                     }
-            });
+                });
+            } catch (Exception es){
 
+                es.printStackTrace();
+
+            }
         });
 
         botonEditarCredencial.setOnAction(e->{
@@ -199,37 +232,44 @@ public class VistaCredenciales {
 
             DialogoEditarCredencial dialogoEditarCredencial = new DialogoEditarCredencial((Stage) root.getScene().getWindow());
 
-            dialogoEditarCredencial.mostrar(seleccionada, datos ->{
+            try {
 
-                if(datos == null){
-                    return;
-                }
-                try{
-                    controladorPrincipal.editarCredencial(
-                            datos.idCredencial(),
-                            datos.urlIdentificador(),
-                            datos.username(),
-                            datos.password(),
-                            datos.destacada(),
-                            datos.anotaciones(),
-                            datos.caduca(),
-                            datos.fechaCaducidad(),
-                            datos.periodoCaducidad(),
-                            datos.reqLongitud(),
-                            datos.reqMayusculas(),
-                            datos.reqMinusculas(),
-                            datos.reqDigitos(),
-                            datos.reqEspeciales(),
-                            datos.idCategoria()
-                    );
+                List<Categoria> listaCategorias = controladorPrincipal.obtenerCategorias();
 
-                  refrescarTabla(tablaCredenciales);
+                dialogoEditarCredencial.mostrar(seleccionada, listaCategorias,datos -> {
 
-                } catch (Exception exc){
+                    if (datos == null) {
+                        return;
+                    }
+                    try {
+                        controladorPrincipal.editarCredencial(
+                                datos.idCredencial(),
+                                datos.urlIdentificador(),
+                                datos.username(),
+                                datos.password(),
+                                datos.destacada(),
+                                datos.anotaciones(),
+                                datos.caduca(),
+                                datos.fechaCaducidad(),
+                                datos.periodoCaducidad(),
+                                datos.reqLongitud(),
+                                datos.reqMayusculas(),
+                                datos.reqMinusculas(),
+                                datos.reqDigitos(),
+                                datos.reqEspeciales(),
+                                datos.idCategoria()
+                        );
 
-                    exc.printStackTrace();
-                }});
+                        refrescarTabla(tablaCredenciales);
+                        botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
+                    } catch (Exception exc) {
 
+                        exc.printStackTrace();
+                    }
+                });
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
         });
 
 
@@ -251,7 +291,10 @@ public class VistaCredenciales {
             try{
                 controladorPrincipal.eliminarCredencial(seleccionada);
 
+                botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
+                idCredencialVisible = null;
                 refrescarTabla(tablaCredenciales);
+
 
             } catch (Exception ex) {
 
@@ -261,6 +304,32 @@ public class VistaCredenciales {
 
 
         });
+
+        botonBuscar.setOnAction(e->{
+            try{
+                List<Credencial> listaBusqueda = controladorPrincipal.buscarCredencial(campoBusqueda.getText());
+                tablaCredenciales.setItems(FXCollections.observableArrayList(listaBusqueda));
+            } catch (Exception exce){
+                exce.printStackTrace();
+            }
+        });
+
+        botonLimpiarBusqueda.setOnAction(e->{
+            try{
+                campoBusqueda.clear();
+                idCredencialVisible = null;
+                refrescarTabla(tablaCredenciales);
+                botonCopiarPassword.setDisable(true);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        });
+
+        campoBusqueda.setOnAction(e-> botonBuscar.fire());
+
+
+
+
 
 
         botonTogglePassword.setOnAction(e ->{
@@ -275,21 +344,53 @@ public class VistaCredenciales {
             } else {
                 idCredencialVisible = seleccionada.getIdCredencial();
             }
+
+            botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
+
             try{
-                refrescarTabla(tablaCredenciales);
+                tablaCredenciales.refresh();
+                botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
             } catch (Exception ex){
                 ex.printStackTrace();
             }
 
         });
 
+        botonCopiarPassword.setOnAction(e->{
+            Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
+
+            if(!sePuedeCopiar(seleccionada)){
+                return;
+            }
+
+
+
+            ClipboardContent contenido = new ClipboardContent();
+            contenido.putString(seleccionada.getPassword());
+
+
+            Clipboard portapapeles = Clipboard.getSystemClipboard();
+            portapapeles.setContent(contenido);
+
+
+            Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+            alerta.setTitle("Contraseña copiada");
+            alerta.setHeaderText(null);
+            alerta.setContentText("La contraseña se ha copiado al portapapeles");
+            alerta.showAndWait();
+
+        });
 
         HBox barraSuperior = new HBox(
                 10,
                 botonNuevaCredencial,
                 botonEditarCredencial,
                 botonEliminarCredencial,
-                botonTogglePassword);
+                botonTogglePassword,
+                botonCopiarPassword,
+                campoBusqueda,
+                botonBuscar,
+                botonLimpiarBusqueda);
 
 
         try{
@@ -317,6 +418,10 @@ public class VistaCredenciales {
             return "";
         }
         return "*".repeat(password.length());
+    }
+
+    private boolean sePuedeCopiar(Credencial credencial){
+        return credencial != null && idCredencialVisible != null && credencial.getIdCredencial() == idCredencialVisible;
     }
 
 }
