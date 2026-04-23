@@ -3,34 +3,27 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
-import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
-import com.vaultdesk.negocio.GestorCategorias;
-import com.vaultdesk.negocio.GestorCredenciales;
-import com.vaultdesk.negocio.GestorRutasAplicacion;
+import com.vaultdesk.negocio.*;
 import com.vaultdesk.persistencia.GestorBaseDatos;
 import com.vaultdesk.persistencia.GestorPersistencia;
-import com.vaultdesk.ui.DialogoNuevaBoveda;
-import com.vaultdesk.ui.DialogoPassword;
-import com.vaultdesk.ui.VistaInicial;
-import com.vaultdesk.ui.VistaPrincipal;
+import com.vaultdesk.ui.*;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 public class ControladorPrincipal {
@@ -330,7 +323,7 @@ public class ControladorPrincipal {
 
         String sentenciaInsercion = """
                 INSERT INTO boveda (id_boveda, nombre, umbral_alerta, accesibilidad, id_idioma, id_tema_visual)
-                VALUES (1, ?, 30, 0, 1, 1)
+                VALUES (1, ?, 7, 0, 1, 1)
                 """;
 
         try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaInsercion)){
@@ -830,6 +823,135 @@ public class ControladorPrincipal {
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
 
         return gestorCredenciales.buscarCredenciales(conexionActual, bovedaActual.getIdBoveda(), textoBusqueda);
+
+
+    }
+
+    public List<AlertaCaducidad> obtenerAlertasCaducidad() throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda activa");
+        }
+
+        List<Credencial> listaCredenciales = obtenerCredenciales();
+        List<AlertaCaducidad> listaAlertas = new ArrayList<>();
+
+
+
+        LocalDate fechaHoy = LocalDate.now();
+
+        int umbralDias = bovedaActual.getUmbralAlerta();
+
+        if(umbralDias <= 0){
+            umbralDias = 30;
+        }
+
+
+        for(Credencial credencial : listaCredenciales){
+
+
+
+            if(!credencial.isCaduca()){
+                continue;
+            }
+
+            LocalDate fechaCaducidad = calcularFechaCaducidad(credencial);
+
+            if(fechaCaducidad == null){
+                continue;
+            }
+
+
+
+
+            AlertaCaducidad alerta = new AlertaCaducidad();
+            alerta.setCredencial(credencial);
+            alerta.setFechaCaducidad(fechaCaducidad);
+
+            if(fechaCaducidad.isBefore(fechaHoy) || fechaCaducidad.isEqual(fechaHoy)){
+
+                alerta.setEstado("Caducada");
+                listaAlertas.add(alerta);
+
+            } else if(!fechaCaducidad.isAfter(fechaHoy.plusDays(umbralDias))){
+
+                alerta.setEstado("Próxima a caducar");
+                listaAlertas.add(alerta);
+
+            }
+
+
+        }
+
+        listaAlertas.sort(Comparator.comparing(AlertaCaducidad::getFechaCaducidad)); // Genius
+
+        return listaAlertas;
+
+
+    }
+
+    private LocalDate calcularFechaCaducidad(Credencial credencial){
+
+        if(!credencial.isCaduca()){
+
+            return null;
+        }
+        if(credencial.getFechaCaducidad() != null){
+
+            return credencial.getFechaCaducidad();
+        }
+        if(credencial.getPeriodoCaducidad() > 0 && credencial.getFechaUltimoUpdate() != null){
+
+            return credencial.getFechaUltimoUpdate().plusDays(credencial.getPeriodoCaducidad());
+        }
+        return null;
+    }
+
+
+
+    public void exportarACsv(Path rutaCsv) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No existe ninguna conexión activa");
+        }
+
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        List<Credencial> listaCredenciales = obtenerCredenciales();
+
+        if(listaCredenciales.isEmpty()){
+            throw new IllegalStateException("No hay credenciales para exportar");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+        gestorCredenciales.exportarCredencialesCSV(listaCredenciales, rutaCsv);
+
+    }
+
+
+    public boolean confirmarExportacion(){
+
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Exportar credenciales");
+        alerta.setHeaderText("Vas a exportar tus credenciales en formato visible");
+        alerta.setContentText("El archivo contendrá información sensible sin cifrar. ¿Deseas continuar?");
+
+        Optional<ButtonType> respuesta = alerta.showAndWait();
+
+        return respuesta.isPresent() && respuesta.get() == ButtonType.OK;
+    }
+
+
+    public String generarPassword(int longitud, int mayusculas, int minusculas, int digitos, int especiales){
+
+        GestorPasswords gestorPasswords = new GestorPasswords();
+
+        return gestorPasswords.generarPassword(longitud, mayusculas, minusculas, digitos, especiales);
 
 
     }

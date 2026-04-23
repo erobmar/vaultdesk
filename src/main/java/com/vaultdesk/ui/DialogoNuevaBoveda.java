@@ -77,33 +77,6 @@ public class DialogoNuevaBoveda {
 
         callback.accept(resultado.orElse(null));
 
-        /*
-        TextInputDialog dialogoNombre = new TextInputDialog();
-
-        dialogoNombre.initOwner(owner);
-
-        dialogoNombre.setTitle("Nueva bóveda");
-        dialogoNombre.setHeaderText("Nombre de la bóveda");
-
-        Optional<String> resultadoNombre = dialogoNombre.showAndWait();
-
-        if(resultadoNombre.isEmpty()){
-            callback.accept(null);
-            return;
-        }
-
-        DialogoPassword dialogoPassword = new DialogoPassword(owner);
-
-        dialogoPassword.mostrar(password -> {
-
-            if(password == null || password.length == 0){
-                callback.accept(null);
-                return;
-            }
-            callback.accept(new DatosNuevaBoveda(resultadoNombre.get(), password));
-
-        });
-        */
 
     }
 
