@@ -165,6 +165,7 @@ public class VistaCredenciales {
         Button botonEliminarCredencial = new Button("Eliminar");
         Button botonTogglePassword = new Button("Mostrar/Ocultar password");
         Button botonCopiarPassword = new Button("Copiar password");
+        Button botonActualizarPassword = new Button("Actualizar password");
         botonCopiarPassword.setDisable(true);
 
         // Sección de búsqueda
@@ -327,11 +328,6 @@ public class VistaCredenciales {
 
         campoBusqueda.setOnAction(e-> botonBuscar.fire());
 
-
-
-
-
-
         botonTogglePassword.setOnAction(e ->{
 
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
@@ -381,6 +377,28 @@ public class VistaCredenciales {
 
         });
 
+        botonActualizarPassword.setOnAction(e->{
+            Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
+
+            if(seleccionada == null){
+                return;
+            }
+
+            boolean confirmado = controladorPrincipal.confirmarActualizacionPassword();
+
+            if(!confirmado){
+                return;
+            }
+            try{
+                controladorPrincipal.actualizarPasswordCredencial(seleccionada);
+                refrescarTabla(tablaCredenciales);
+                tablaCredenciales.refresh();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+        });
+
         HBox barraSuperior = new HBox(
                 10,
                 botonNuevaCredencial,
@@ -388,6 +406,7 @@ public class VistaCredenciales {
                 botonEliminarCredencial,
                 botonTogglePassword,
                 botonCopiarPassword,
+                botonActualizarPassword,
                 campoBusqueda,
                 botonBuscar,
                 botonLimpiarBusqueda);

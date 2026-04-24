@@ -60,6 +60,7 @@ public class VistaPrincipal {
         VistaCategorias vistaCategorias = new VistaCategorias(controladorPrincipal);
         VistaAlertas vistaAlertas = new VistaAlertas(controladorPrincipal);
         VistaGenerador vistaGenerador = new VistaGenerador(controladorPrincipal);
+        VistaAjustes vistaAjustes = new VistaAjustes(controladorPrincipal);
 
         TabPane panelPestanas = new TabPane();
 
@@ -67,7 +68,7 @@ public class VistaPrincipal {
         Tab pestanaCategorias = new Tab("Categorias", vistaCategorias.crearContenido());
         Tab pestanaGenerador = new Tab("Generador", vistaGenerador.crearContenido());
         Tab pestanaAlertas = new Tab("Alertas" , vistaAlertas.crearContenido());
-        Tab pestanaAjustes = new Tab("Ajustes", new Label("Contenido de Ajustes del Sistema"));
+        Tab pestanaAjustes = new Tab("Ajustes", vistaAjustes.crearContenido());
 
         pestanaCredenciales.setClosable(false);
         pestanaCategorias.setClosable(false);

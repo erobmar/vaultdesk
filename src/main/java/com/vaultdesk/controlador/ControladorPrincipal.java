@@ -1,14 +1,13 @@
 package com.vaultdesk.controlador;
 
-import com.vaultdesk.dominio.Boveda;
-import com.vaultdesk.dominio.Categoria;
-import com.vaultdesk.dominio.Credencial;
+import com.vaultdesk.dominio.*;
 import com.vaultdesk.negocio.*;
 import com.vaultdesk.persistencia.GestorBaseDatos;
 import com.vaultdesk.persistencia.GestorPersistencia;
 import com.vaultdesk.ui.*;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
@@ -120,6 +119,7 @@ public class ControladorPrincipal {
 
                         Boveda boveda = cargarBovedaActualDesdeBD(conexion);
 
+
                         if(conexionActual != null && !conexionActual.isClosed()){
                             conexionActual.close();
                         }
@@ -148,13 +148,21 @@ public class ControladorPrincipal {
 
     public void salirAplicacion(){
 
+        if(!resolverCambiosPendientes()){
+            return;
+        }
         try{
             if(conexionActual != null && !conexionActual.isClosed()){
                 conexionActual.close();
             }
-        } catch (Exception ignorado){
+        } catch (Exception e){
+
+            mostrarMensajeError("Error al cerrar la conexión", e.getMessage());
+            return;
         }
+
         primaryStage.close();
+
     }
 
     public Connection getConexionActual(){
@@ -175,72 +183,100 @@ public class ControladorPrincipal {
 
     public void cerrarBoveda(){
 
+        if(!resolverCambiosPendientes()){
+            return;
+        }
         try{
-
-            if(bovedaActual != null && bovedaActual.isModificadaSinGuardar()){
-
-                ButtonType decision = mostrarConfirmacionCierre();
-
-                if("Cancelar".equals(decision.getText())){
-                    return;
-                }
-                if("Guardar".equals(decision.getText())){
-
-                    guardarBoveda();
-                    if(bovedaActual != null && bovedaActual.isModificadaSinGuardar()){
-                        return;
-                    }
-                }
-            }
-
-
             if(conexionActual != null && !conexionActual.isClosed()){
                 conexionActual.close();
             }
-        } catch (Exception e){
-            e.printStackTrace();
-            mostrarMensajeError("Error al cerrar la bóveda",
-                    e.getClass().getSimpleName() + ": " + e.getMessage());
-            return;
-        }
-        conexionActual = null;
-        rutaBoveda = null;
-        bovedaActual = null;
 
-        mostrarVistaInicial();
+            conexionActual = null;
+            rutaBoveda = null;
+            bovedaActual = null;
+
+            mostrarVistaInicial();
+
+        } catch (Exception e){
+
+            mostrarMensajeError("Error al cerrar la bóveda", e.getMessage());
+        }
     }
 
-    public void guardarBoveda(){
+    private boolean resolverCambiosPendientes(){
+        if(bovedaActual == null || !bovedaActual.isModificadaSinGuardar()){
+            return true;
+        }
+
+        ButtonType decision = mostrarConfirmacionCierre();
+
+        if(decision.getText().equals("Cancelar")){
+            return false;
+        }
+        if(decision.getText().equals("No Guardar")){
+            return true;
+        }
+        if(decision.getText().equals("Guardar")){
+
+            DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
+            char[] passwordMaestra = dialogoPassword.mostrarYEsperar();
+
+            try{
+                return guardarBovedaInterna(passwordMaestra);
+            } finally {
+                Arrays.fill(passwordMaestra, '\0');
+            }
+
+        }
+        return false;
+    }
+
+    private boolean guardarBovedaInterna(char[] passwordMaestra){
 
         if(conexionActual == null || rutaBoveda == null){
             mostrarMensajeError("Error", "No hay ninguna bóveda abierta");
-            return;
+            return false;
         }
+
+        if(passwordMaestra == null || passwordMaestra.length == 0){
+            return false;
+        }
+
+        try{
+            gestorPersistencia.guardarBovedaDesdeMemoria(rutaBoveda, passwordMaestra, conexionActual);
+            mostrarMensajeInformacion("Guardar bóveda", "La bóveda se ha guardado correctamente");
+
+            if(bovedaActual != null){
+                bovedaActual.setModificadaSinGuardar(false);
+                actualizarTituloVentana();
+            }
+
+            return true;
+
+        } catch (Exception e){
+
+            e.printStackTrace();
+            mostrarMensajeError("Error al guardar la bóveda", e.getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
+
+    }
+
+    public void guardarBoveda(){
 
         DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
 
         dialogoPassword.mostrar(passwordMaestra ->{
 
-            if(passwordMaestra == null || passwordMaestra.length == 0){
-                return;
-            }
             try{
-
-                gestorPersistencia.guardarBovedaDesdeMemoria(rutaBoveda, passwordMaestra, conexionActual);
-                mostrarMensajeInformacion("Guardar bóveda", "La bóveda se ha guardado correctamente");
-
-                if(bovedaActual != null){
-                    bovedaActual.setModificadaSinGuardar(false);
-                    actualizarTituloVentana();
-                }
-
-            } catch (Exception e){
-                e.printStackTrace();
-                mostrarMensajeError("Error al guardar la bóveda",
-                        e.getClass().getSimpleName() + ": " + e.getMessage());
+                guardarBovedaInterna(passwordMaestra);
             } finally {
-                Arrays.fill(passwordMaestra, '\0');
+                if(passwordMaestra != null){
+                    Arrays.fill(passwordMaestra, '\0');
+                }
             }
+
+
         });
     }
 
@@ -292,6 +328,8 @@ public class ControladorPrincipal {
 
                 // 3 - Cargar los datos a la bóveda
                 Boveda boveda = cargarBovedaActualDesdeBD(conexion);
+
+
 
                 // 4 - Guardar bóveda cifrada
                 gestorPersistencia.guardarBovedaDesdeMemoria(ruta, password, conexion);
@@ -376,8 +414,19 @@ public class ControladorPrincipal {
     public Boveda cargarBovedaActualDesdeBD(Connection conexion) throws Exception{
 
         String sentenciaCarga = """
-                SELECT id_boveda, nombre, umbral_alerta, accesibilidad
-                FROM boveda
+                SELECT
+                    b.id_boveda,
+                    b.nombre,
+                    b.umbral_alerta,
+                    b.accesibilidad,
+                    b.id_idioma,
+                    i.nombre AS nombre_idioma,
+                    b.id_tema_visual,
+                    t.nombre AS nombre_tema_visual
+                FROM boveda b
+                JOIN idioma i ON b.id_idioma = i.id_idioma
+                JOIN tema_visual t ON b.id_tema_visual = t.id_tema_visual
+                WHERE b.id_boveda = 1
                 LIMIT 1
                 """;
 
@@ -385,12 +434,24 @@ public class ControladorPrincipal {
             ResultSet setResultados = sentencia.executeQuery();
 
             if(setResultados.next()){
+
+
                 Boveda boveda = new Boveda();
+
+                Idioma idioma = new Idioma();
+                idioma.setIdIdioma(setResultados.getInt("id_idioma"));
+                idioma.setNombre(setResultados.getString("nombre_idioma"));
+
+                TemaVisual temaVisual = new TemaVisual();
+                temaVisual.setIdTemaVisual(setResultados.getInt("id_tema_visual"));
+                temaVisual.setNombre(setResultados.getString("nombre_tema_visual"));
 
                 boveda.setIdBoveda(setResultados.getInt("id_boveda"));
                 boveda.setNombre(setResultados.getString("nombre"));
                 boveda.setUmbralAlerta(setResultados.getInt("umbral_alerta"));
                 boveda.setAccesibilidad(setResultados.getInt("accesibilidad") == 1);
+                boveda.setIdioma(idioma);
+                boveda.setTemaVisual(temaVisual);
                 boveda.setModificadaSinGuardar(false);
 
                 return boveda;
@@ -955,5 +1016,184 @@ public class ControladorPrincipal {
 
 
     }
+
+    public List<Idioma> obtenerIdiomas() throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay una conexión abierta");
+        }
+
+        String sentenciaConsulta = """
+                SELECT id_idioma, nombre FROM idioma ORDER BY id_idioma
+                """;
+
+        List<Idioma> listaIdiomas = new ArrayList<>();
+
+        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
+
+            ResultSet setResultados = sentencia.executeQuery();
+
+            while(setResultados.next()){
+
+                Idioma idioma = new Idioma();
+                idioma.setIdIdioma(setResultados.getInt("id_idioma"));
+                idioma.setNombre(setResultados.getString("nombre"));
+
+                listaIdiomas.add(idioma);
+            }
+
+        }
+
+        return listaIdiomas;
+
+    }
+
+
+    public List<TemaVisual> obtenerTemasVisuales() throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+
+        String sentenciaConsulta = """
+                SELECT id_tema_visual, nombre
+                FROM tema_visual
+                ORDER BY id_tema_visual
+                """;
+
+        List<TemaVisual> listaTemasVisuales = new ArrayList<>();
+
+        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
+
+            ResultSet setResultados = sentencia.executeQuery();
+
+            while (setResultados.next()){
+
+                TemaVisual temaVisual = new TemaVisual();
+                temaVisual.setIdTemaVisual(setResultados.getInt("id_tema_visual"));
+                temaVisual.setNombre(setResultados.getString("nombre"));
+
+                listaTemasVisuales.add(temaVisual);
+
+
+            }
+
+        }
+
+        return listaTemasVisuales;
+    }
+
+    public void actualizarAjustesBoveda(
+            int umbralAlerta,
+            boolean accesibilidad,
+            Idioma idioma,
+            TemaVisual temaVisual
+    ) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión abierta");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+        if(umbralAlerta < 0){
+            throw new IllegalArgumentException("El umbral de alerta no puede ser menor que 0");
+        }
+        if(idioma == null){
+            throw new IllegalStateException("Se debe seleccionar un idioma");
+        }
+        if(temaVisual == null){
+            throw new IllegalStateException("Se debe seleccionar un tema visual");
+        }
+
+        String sentenciaActualizacion = """
+                UPDATE boveda
+                SET umbral_alerta = ?,
+                    accesibilidad = ?,
+                    id_idioma = ?,
+                    id_tema_visual = ?
+                WHERE id_boveda = ?
+                """;
+
+        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaActualizacion)){
+
+            sentencia.setInt(1, umbralAlerta);
+            sentencia.setInt(2, accesibilidad ? 1 : 0);
+            sentencia.setInt(3, idioma.getIdIdioma());
+            sentencia.setInt(4, temaVisual.getIdTemaVisual());
+            sentencia.setInt(5, bovedaActual.getIdBoveda());
+
+            sentencia.executeUpdate();
+
+
+        }
+
+        bovedaActual.setUmbralAlerta(umbralAlerta);
+        bovedaActual.setAccesibilidad(accesibilidad);
+        bovedaActual.setTemaVisual(temaVisual);
+        bovedaActual.setModificadaSinGuardar(true);
+
+        actualizarTituloVentana();
+
+        mostrarMensajeInformacion("Ajustes", "Los ajustes se han actualizado correctamente");
+
+
+    }
+
+
+    public void actualizarPasswordCredencial(Credencial credencial) throws  Exception{
+
+        if(credencial == null){
+            throw new IllegalArgumentException("Se debe especificar una credencial");
+        }
+
+        String nuevaPassword = generarPassword(
+                credencial.getReqLongitud(),
+                credencial.getReqMayusculas(),
+                credencial.getReqMinusculas(),
+                credencial.getReqDigitos(),
+                credencial.getReqEspeciales()
+        );
+
+        editarCredencial(
+                credencial.getIdCredencial(),
+                credencial.getUrlIdentificador(),
+                credencial.getUsername(),
+                nuevaPassword,
+                credencial.isDestacada(),
+                credencial.getAnotaciones(),
+                credencial.isCaduca(),
+                credencial.getFechaCaducidad() == null ? "" : credencial.getFechaCaducidad().toString(),
+                credencial.getPeriodoCaducidad(),
+                credencial.getReqLongitud(),
+                credencial.getReqMayusculas(),
+                credencial.getReqMinusculas(),
+                credencial.getReqDigitos(),
+                credencial.getReqEspeciales(),
+                credencial.getCategoria().getIdCategoria()
+
+
+        );
+
+
+    }
+
+    public boolean confirmarActualizacionPassword(){
+
+        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+        alerta.setTitle("Actualizar contraseña");
+        alerta.setHeaderText("Se generará una nueva contraseña para la credencial seleccionada");
+        alerta.setContentText("La contraseña actual será sustituida ¿Deseas continuar?");
+
+        Optional<ButtonType> eleccion = alerta.showAndWait();
+
+        return eleccion.isPresent() && eleccion.get() == ButtonType.OK;
+
+
+    }
+
+
+
+
 
 }
