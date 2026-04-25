@@ -107,7 +107,7 @@ public class ControladorPrincipal {
 
         DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
 
-        dialogoPassword.mostrar(
+        dialogoPassword.mostrar( "Introduzca la contraseña maestra de la bóveda",
                 passwordMaestra -> {
 
                     if(passwordMaestra == null || passwordMaestra.length == 0){
@@ -266,7 +266,7 @@ public class ControladorPrincipal {
 
         DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
 
-        dialogoPassword.mostrar(passwordMaestra ->{
+        dialogoPassword.mostrar("Introduzca la contraseña maestra de la bóveda", passwordMaestra ->{
 
             try{
                 guardarBovedaInterna(passwordMaestra);
@@ -381,13 +381,13 @@ public class ControladorPrincipal {
 
         DialogoPassword dialogoPasswordActual = new DialogoPassword(primaryStage);
 
-        dialogoPasswordActual.mostrar(passwordActual ->{
+        dialogoPasswordActual.mostrar("Introduzca la contraseña maestra actual", passwordActual ->{
             if(passwordActual == null || passwordActual.length == 0) {
                 return;
             }
 
             DialogoPassword dialogoPasswordNueva = new DialogoPassword(primaryStage);
-            dialogoPasswordNueva.mostrar(passwordNueva ->{
+            dialogoPasswordNueva.mostrar("Introduzca la nueva contraseña maestra", passwordNueva ->{
                 if(passwordNueva == null || passwordActual.length == 0){
                     mostrarMensajeError("Error", "La contraseña no es válida");
                     Arrays.fill(passwordActual, '\0');
@@ -1163,7 +1163,7 @@ public class ControladorPrincipal {
                 credencial.isDestacada(),
                 credencial.getAnotaciones(),
                 credencial.isCaduca(),
-                credencial.getFechaCaducidad() == null ? "" : credencial.getFechaCaducidad().toString(),
+                null,
                 credencial.getPeriodoCaducidad(),
                 credencial.getReqLongitud(),
                 credencial.getReqMayusculas(),
@@ -1192,8 +1192,48 @@ public class ControladorPrincipal {
 
     }
 
+    public List<Credencial> obtenerCredencialesPorCategoria(int idCategoria) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+        return gestorCredenciales.obtenerCredencialesPorCategoria(conexionActual, idCategoria);
 
 
 
+    }
+
+    public void toggleDestacada(Credencial credencial) throws Exception{
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay una conexión activa");
+        }
+
+        boolean nuevoValor = !credencial.isDestacada();
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+        gestorCredenciales.actualizarDestacada(conexionActual, credencial.getIdCredencial(), nuevoValor);
+
+        bovedaActual.setModificadaSinGuardar(true);
+        actualizarTituloVentana();
+
+    }
+
+    public List<Credencial> obtenerCredencialesDestacadas() throws Exception {
+
+        if(conexionActual == null || conexionActual.isClosed()){
+            throw new IllegalStateException("No hay ninguna conexión activa");
+        }
+        if(bovedaActual == null){
+            throw new IllegalStateException("No hay ninguna bóveda abierta");
+        }
+
+        GestorCredenciales gestorCredenciales = new GestorCredenciales();
+
+        return gestorCredenciales.obtenerCredencialesDestacadas(conexionActual, bovedaActual.getIdBoveda());
+
+    }
 
 }

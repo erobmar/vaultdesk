@@ -3,6 +3,7 @@ package com.vaultdesk.ui;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -17,14 +18,14 @@ public class DialogoPassword {
             this.escena = escena;
         }
 
-        public void mostrar(Consumer<char[]> callback){
+        public void mostrar(String mensaje, Consumer<char[]> callback){
 
             Dialog<char[]> dialogo = new Dialog<>();
 
             dialogo.initOwner(escena);
             dialogo.initModality(Modality.APPLICATION_MODAL);
             dialogo.setTitle("Contraseña maestra");
-            dialogo.setHeaderText("Introduce la contraseña maestra de la bóveda");
+            dialogo.setHeaderText(mensaje);
 
             PasswordField password = new PasswordField();
             password.setPromptText("Contraseña maestra");
@@ -76,13 +77,14 @@ public class DialogoPassword {
             dialogo.close();
         });
 
+        HBox botones = new HBox(10, botonAceptar, botonCancelar);
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
         root.getChildren().addAll(
                 new Label("Introduce la contraseña maestra"),
                 campoPassword,
-                botonAceptar,
-                botonCancelar
+                botones
         );
 
         dialogo.setScene(new Scene(root, 350, 150));

@@ -12,6 +12,12 @@ public class VaultDeskApp extends Application {
     public void start(Stage primaryStage) {
 
         ControladorPrincipal controladorPrincipal = new ControladorPrincipal(primaryStage);
+
+        primaryStage.setOnCloseRequest(e->{
+            e.consume();
+            controladorPrincipal.salirAplicacion();
+        });
+
         controladorPrincipal.mostrarVistaInicial();
     }
 

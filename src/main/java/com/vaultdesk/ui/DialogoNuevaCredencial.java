@@ -37,7 +37,10 @@ public class DialogoNuevaCredencial {
         TextField campoAnotaciones = new TextField();
 
         CheckBox checkBoxCaduca = new CheckBox("Caduca");
-        TextField campoFechaCaducidad = new TextField();
+        //TextField campoFechaCaducidad = new TextField();
+
+        DatePicker campoFechaCaducidad = new DatePicker();
+
         TextField campoPeriodoCaducidad = new TextField();
 
         TextField campoReqLongitud = new TextField();
@@ -50,8 +53,8 @@ public class DialogoNuevaCredencial {
         campoUsername.setPromptText("Username");
         campoPassword.setPromptText("Password");
         campoAnotaciones.setPromptText("Anotaciones");
-        campoFechaCaducidad.setPromptText("yyyy-MM-dd");
-        campoPeriodoCaducidad.setPromptText("Segundos");
+        campoFechaCaducidad.setPromptText("Fecha de caducidad");
+        campoPeriodoCaducidad.setPromptText("Días");
         campoReqLongitud.setPromptText("0");
         campoReqMayusculas.setPromptText("0");
         campoReqMinusculas.setPromptText("0");
@@ -89,6 +92,8 @@ public class DialogoNuevaCredencial {
                 String password = campoPassword.getText();
                 Categoria categoriaSeleccionada = comboBoxCategoria.getValue();
 
+                String fechaCaducidad = campoFechaCaducidad.getValue() == null ? null : campoFechaCaducidad.getValue().toString();
+
                 if (urlIdentificador.isEmpty()) {
                     etiquetaError.setText("Debes indicar una URL o identificador de sistema");
                     return;
@@ -111,7 +116,8 @@ public class DialogoNuevaCredencial {
                         checkBoxDestacada.isSelected(),
                         campoAnotaciones.getText(),
                         checkBoxCaduca.isSelected(),
-                        campoFechaCaducidad.getText(),
+                        //campoFechaCaducidad.getValue().toString(),
+                        fechaCaducidad,
                         parseEntero(campoPeriodoCaducidad.getText()),
                         parseEntero(campoReqLongitud.getText()),
                         parseEntero(campoReqMayusculas.getText()),

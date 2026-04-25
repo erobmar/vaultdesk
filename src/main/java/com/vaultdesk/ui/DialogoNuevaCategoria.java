@@ -68,6 +68,11 @@ public class DialogoNuevaCategoria {
         parrilla.setVgap(10);
         parrilla.setPadding(new Insets(15));
 
+        campoDescripcion.setPrefWidth(200);
+        campoNombre.setPrefWidth(200);
+
+
+
         int fila = 0;
 
         parrilla.add(new Label("Nombre"), 0, fila);
@@ -82,7 +87,7 @@ public class DialogoNuevaCategoria {
         parrilla.add(botonAceptar, 0, fila);
         parrilla.add(botonCancelar, 1, fila);
 
-        dialogo.setScene(new Scene(parrilla, 400, 240));
+        dialogo.setScene(new Scene(parrilla, 320, 240));
         dialogo.show();
 
 

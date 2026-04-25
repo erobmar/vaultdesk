@@ -84,6 +84,10 @@ public class VistaPrincipal {
                 pestanaAjustes);
 
         panelPestanas.getSelectionModel().selectedItemProperty().addListener((obs, anterior, actual) ->{
+            if(actual == pestanaCredenciales){
+                pestanaCredenciales.setContent(new VistaCredenciales(controladorPrincipal).crearContenido());
+            }
+
             if(actual == pestanaAlertas){
                 VistaAlertas nuevaVistaAlertas = new VistaAlertas(controladorPrincipal);
                 pestanaAlertas.setContent(nuevaVistaAlertas.crearContenido());
@@ -93,7 +97,7 @@ public class VistaPrincipal {
         root.setTop(menu);
         root.setCenter(panelPestanas);
 
-        return new Scene(root,1000, 1000);
+        return new Scene(root,1050, 800);
 
 
     }

@@ -59,13 +59,24 @@ public class DialogoEditarCredencial {
         CheckBox checkBoxCaduca = new CheckBox("Caduca");
         checkBoxCaduca.setSelected(credencial.isCaduca());
 
-        TextField campoFechaCaducidad = new TextField(credencial.getFechaCaducidad() == null ? "" : credencial.getFechaCaducidad().toString());
+        //TextField campoFechaCaducidad = new TextField(credencial.getFechaCaducidad() == null ? "" : credencial.getFechaCaducidad().toString());
+
+        DatePicker campoFechaCaducidad = new DatePicker(credencial.getFechaCaducidad() == null ? null : credencial.getFechaCaducidad());
+
         TextField campoPeriodoCaducidad = new TextField(credencial.getPeriodoCaducidad() <= 0 ? "" : String.valueOf(credencial.getPeriodoCaducidad()));
         TextField campoReqLongitud = new TextField(credencial.getReqLongitud() <= 0 ? "" : String.valueOf(credencial.getReqLongitud()));
         TextField campoReqMayusculas = new TextField(credencial.getReqMayusculas() <= 0 ? "" : String.valueOf(credencial.getReqMayusculas()));
         TextField campoReqMinusculas = new TextField(credencial.getReqMinusculas() <= 0 ? "" : String.valueOf(credencial.getReqMinusculas()));
         TextField campoReqDigitos = new TextField(credencial.getReqDigitos() <= 0 ? "" : String.valueOf(credencial.getReqDigitos()));
         TextField campoReqEspeciales = new TextField(credencial.getReqEspeciales() <= 0 ? "" : String.valueOf(credencial.getReqEspeciales()));
+
+        campoPeriodoCaducidad.setPromptText("Días");
+        campoReqLongitud.setPromptText("Longitud mínima");
+        campoReqMayusculas.setPromptText("Mayúsculas");
+        campoReqMinusculas.setPromptText("Minúsculas");
+        campoReqDigitos.setPromptText("Dígitos");
+        campoReqEspeciales.setPromptText("Caracteres especiales");
+
 
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red");
@@ -81,6 +92,8 @@ public class DialogoEditarCredencial {
                 String username = campoUsername.getText() == null ? "" : campoUsername.getText().trim();
                 String password = campoPassword.getText();
                 Categoria categoriaSeleccionada = comboBoxCategoria.getValue();
+
+                String fechaCaducidad = campoFechaCaducidad.getValue().toString() == null ? null : campoFechaCaducidad.getValue().toString();
 
                 if (url.isEmpty()) {
                     etiquetaError.setText("Debes especificar una URL o Identificador de sistema");
@@ -107,7 +120,8 @@ public class DialogoEditarCredencial {
                         checkBoxDestacada.isSelected(),
                         campoAnotaciones.getText(),
                         checkBoxCaduca.isSelected(),
-                        campoFechaCaducidad.getText(),
+                        //campoFechaCaducidad.getText(),
+                        fechaCaducidad,
                         parseEntero(campoPeriodoCaducidad.getText()),
                         parseEntero(campoReqLongitud.getText()),
                         parseEntero(campoReqMayusculas.getText()),

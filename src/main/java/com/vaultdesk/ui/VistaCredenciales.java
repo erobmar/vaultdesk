@@ -11,8 +11,11 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.sql.ClientInfoStatus;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,29 +138,29 @@ public class VistaCredenciales {
                 columnaCaduca,
                 columnaFechaCaducidad,
                 columnaPeriodoCaducidad,
-                columnaReqLongitud,
+                /*columnaReqLongitud,
                 columnaReqMayusculas,
                 columnaReqMinusculas,
                 columnaReqDigitos,
-                columnaReqEspeciales,
+                columnaReqEspeciales,*/
                 columnaAnotaciones
         );
 
-        columnaID.setPrefWidth(70);
-        columnaUrlIdentificador.setPrefWidth(220);
-        columnaCategoria.setPrefWidth(120);
-        columnaUsername.setPrefWidth(160);
-        columnaPassword.setPrefWidth(160);
-        columnaDestacada.setPrefWidth(80);
-        columnaAnotaciones.setPrefWidth(200);
-        columnaCaduca.setPrefWidth(80);
-        columnaFechaCaducidad.setPrefWidth(120);
-        columnaPeriodoCaducidad.setPrefWidth(130);
-        columnaReqLongitud.setPrefWidth(120);
+        columnaID.setPrefWidth(20);
+        columnaUrlIdentificador.setPrefWidth(150);
+        columnaCategoria.setPrefWidth(100);
+        columnaUsername.setPrefWidth(150);
+        columnaPassword.setPrefWidth(150);
+        columnaDestacada.setPrefWidth(50);
+        columnaAnotaciones.setPrefWidth(185);
+        columnaCaduca.setPrefWidth(50);
+        columnaFechaCaducidad.setPrefWidth(80);
+        columnaPeriodoCaducidad.setPrefWidth(50);
+       /* columnaReqLongitud.setPrefWidth(120);
         columnaReqMayusculas.setPrefWidth(120);
         columnaReqMinusculas.setPrefWidth(120);
         columnaReqDigitos.setPrefWidth(120);
-        columnaReqEspeciales.setPrefWidth(120);
+        columnaReqEspeciales.setPrefWidth(120);*/
 
         // Sección para botón de 'Nueva credencial' - "Editar credencial"
         Button botonNuevaCredencial = new Button("Nueva...");
@@ -166,10 +169,29 @@ public class VistaCredenciales {
         Button botonTogglePassword = new Button("Mostrar/Ocultar password");
         Button botonCopiarPassword = new Button("Copiar password");
         Button botonActualizarPassword = new Button("Actualizar password");
+        Button botonToggleDestacada = new Button("Marca/Descmarca destacada");
+        Button botonSoloDestacadas = new Button("Solo destacadas");
+
+
         botonCopiarPassword.setDisable(true);
 
         // Sección de búsqueda
         TextField campoBusqueda = new TextField("Buscar credenciales...");
+
+        ComboBox<Categoria> comboBoxFiltroCategorias = new ComboBox<>();
+        comboBoxFiltroCategorias.setPromptText("Filtrar por categoría");
+
+        // Poblar el ComboBox de categorías
+        try {
+            List<Categoria> listaCategorias = controladorPrincipal.obtenerCategorias();
+            comboBoxFiltroCategorias.setItems(FXCollections.observableArrayList(listaCategorias));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        Button botonFiltrar = new Button("Filtrar");
+        Button botonLimpiarFiltro = new Button("Limpiar filtro");
 
         Button botonBuscar = new Button("Buscar");
         Button botonLimpiarBusqueda = new Button("Limpiar búsqueda");
@@ -318,6 +340,7 @@ public class VistaCredenciales {
         botonLimpiarBusqueda.setOnAction(e->{
             try{
                 campoBusqueda.clear();
+                comboBoxFiltroCategorias.getSelectionModel().clearSelection();
                 idCredencialVisible = null;
                 refrescarTabla(tablaCredenciales);
                 botonCopiarPassword.setDisable(true);
@@ -399,7 +422,58 @@ public class VistaCredenciales {
 
         });
 
-        HBox barraSuperior = new HBox(
+        botonFiltrar.setOnAction(e->{
+
+            Categoria seleccionFiltro = comboBoxFiltroCategorias.getValue();
+
+            if(seleccionFiltro == null){
+                return;
+            }
+            try {
+                List<Credencial> credencialesFiltradas = controladorPrincipal.obtenerCredencialesPorCategoria(seleccionFiltro.getIdCategoria());
+                tablaCredenciales.setItems(FXCollections.observableArrayList(credencialesFiltradas));
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+        });
+
+        botonLimpiarFiltro.setOnAction(e->{
+            try {
+                comboBoxFiltroCategorias.getSelectionModel().clearSelection();
+                refrescarTabla(tablaCredenciales);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        botonToggleDestacada.setOnAction(e->{
+
+            Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
+
+            if(seleccionada == null){
+                return;
+            }
+            try{
+                controladorPrincipal.toggleDestacada(seleccionada);
+                refrescarTabla(tablaCredenciales);
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+        });
+
+        botonSoloDestacadas.setOnAction(e->{
+            try {
+                List<Credencial> destacadas = controladorPrincipal.obtenerCredencialesDestacadas();
+                tablaCredenciales.setItems(FXCollections.observableArrayList(destacadas));
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        });
+
+
+        HBox controlesOperacion = new HBox(
                 10,
                 botonNuevaCredencial,
                 botonEditarCredencial,
@@ -407,21 +481,36 @@ public class VistaCredenciales {
                 botonTogglePassword,
                 botonCopiarPassword,
                 botonActualizarPassword,
+                botonToggleDestacada
+        );
+
+        HBox controlesVisualizacion = new HBox(
+                10,
                 campoBusqueda,
                 botonBuscar,
-                botonLimpiarBusqueda);
+                botonLimpiarBusqueda,
+                comboBoxFiltroCategorias,
+                botonFiltrar,
+                botonLimpiarFiltro,
+                botonSoloDestacadas
+        );
+
+
+        VBox controles = new VBox(
+                2, controlesOperacion, controlesVisualizacion
+        );
 
 
         try{
             List<Credencial> credenciales = controladorPrincipal.obtenerCredenciales();
             tablaCredenciales.setItems(FXCollections.observableArrayList(credenciales));
         } catch (Exception e){
-            root.setTop(barraSuperior);
+            root.setTop(controles);
             root.setCenter(new Label("Error al cargar las credenciales" + e.getMessage()));
             return root;
         }
 
-        root.setTop(barraSuperior);
+        root.setTop(controles);
         root.setCenter(tablaCredenciales);
 
         return root;

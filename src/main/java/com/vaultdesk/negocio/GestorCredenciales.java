@@ -894,5 +894,120 @@ public class GestorCredenciales {
 
     }
 
+    public List<Credencial> obtenerCredencialesPorCategoria(Connection conexion, int idCategoria) throws Exception{
+
+        String sentenciaObtencion = """
+                SELECT
+                    c.id_credencial,
+                    c.url_identificador,
+                    c.username,
+                    c.password,
+                    c.destacada,
+                    c.anotaciones,
+                    c.caduca,
+                    c.fecha_caducidad,
+                    c.periodo_caducidad,
+                    c.ultimo_update,
+                    c.req_longitud,
+                    c.req_mayusculas,
+                    c.req_minusculas,
+                    c.req_digitos,
+                    c.req_especiales,
+                    c.id_categoria,
+                    cat.nombre AS nombre_categoria,
+                    cat.descripcion AS descripcion_categoria,
+                    cat.es_del_sistema
+                FROM credencial c
+                JOIN categoria cat ON c.id_categoria = cat.id_categoria
+                WHERE c.id_categoria = ?
+                ORDER BY c.username
+                """;
+
+        List<Credencial> listaCredencialesFiltrada = new ArrayList<>();
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaObtencion)){
+
+            sentencia.setInt(1, idCategoria);
+
+            ResultSet setResultados = sentencia.executeQuery();
+
+            while (setResultados.next()){
+                listaCredencialesFiltrada.add(mapearCredencial(setResultados));
+            }
+
+        }
+
+
+        return listaCredencialesFiltrada;
+    }
+
+    public void actualizarDestacada(Connection conexion, int idCredencial, boolean nuevoValor) throws Exception{
+
+        validarConexion(conexion);
+
+        String sentenciaActualizacion = """
+                UPDATE credencial
+                SET destacada = ?
+                WHERE id_credencial = ?
+                """;
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaActualizacion)){
+
+            sentencia.setInt(1, nuevoValor ? 1 : 0);
+            sentencia.setInt(2, idCredencial);
+
+            sentencia.executeUpdate();
+        }
+    }
+
+    public List<Credencial> obtenerCredencialesDestacadas(Connection conexion, int idBoveda) throws  Exception{
+
+        validarConexion(conexion);
+        validarBoveda(idBoveda);
+
+        String sentenciaObtencion = """
+                SELECT
+                    c.id_credencial,
+                    c.url_identificador,
+                    c.username,
+                    c.password,
+                    c.destacada,
+                    c.anotaciones,
+                    c.caduca,
+                    c.fecha_caducidad,
+                    c.periodo_caducidad,
+                    c.ultimo_update,
+                    c.req_longitud,
+                    c.req_mayusculas,
+                    c.req_minusculas,
+                    c.req_digitos,
+                    c.req_especiales,
+                    c.id_categoria,
+                    cat.nombre AS nombre_categoria,
+                    cat.descripcion AS descripcion_categoria,
+                    cat.es_del_sistema
+                FROM credencial c
+                JOIN categoria cat ON c.id_categoria = cat.id_categoria
+                WHERE c.id_boveda = ? 
+                    AND c.destacada = 1
+                ORDER BY c.username
+                """;
+
+            List<Credencial> listaDestacadas = new ArrayList<>();
+
+            try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaObtencion)){
+                sentencia.setInt(1, idBoveda);
+
+                try(ResultSet setResultados = sentencia.executeQuery()){
+                    while(setResultados.next()){
+                        listaDestacadas.add(mapearCredencial(setResultados));
+                    }
+                }
+
+            }
+
+            return listaDestacadas;
+
+    }
 
 }
