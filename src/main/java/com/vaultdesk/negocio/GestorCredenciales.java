@@ -19,6 +19,85 @@ import java.util.Locale;
 public class GestorCredenciales {
 
     private static final int ID_CATEGORIA_OTROS = 1;
+    private final GestorCaducidadCredenciales gestorCaducidadCredenciales = new GestorCaducidadCredenciales(this);
+    private final GestorConsultasCredenciales gestorConsultasCredenciales = new GestorConsultasCredenciales(this);
+    private final GestorExportacionCredenciales gestorExportacionCredenciales = new GestorExportacionCredenciales(this);
+    private final GestorValidacionCredenciales gestorValidacionCredenciales = new GestorValidacionCredenciales(this);
+
+
+    // Métodos relativos a consultas de credenciales -> Redirigidos a GestorConsultasCredenciales
+
+    public List<Credencial> buscarCredenciales(Connection conexion, int idBoveda, String textoBusqueda) throws SQLException {
+
+        return gestorConsultasCredenciales.buscarCredenciales(conexion, idBoveda,textoBusqueda);
+    }
+
+    public List<Credencial> obtenerCredencialesPorCategoria(Connection conexion, int idCategoria) throws Exception{
+
+        return gestorConsultasCredenciales.obtenerCredencialesPorCategoria(conexion, idCategoria);
+        }
+
+    public List<Credencial> obtenerCredencialesDestacadas(Connection conexion, int idBoveda) throws  Exception{
+
+        return gestorConsultasCredenciales.obtenerCredencialesDestacadas(conexion, idBoveda);
+    }
+
+
+    // Métodos relativos a caducidad de credenciales -> Redirigidos a GestorCaducidadCredenciales
+
+    public boolean estaCaducada(Credencial credencial, LocalDate fechaReferencia){
+
+        return gestorCaducidadCredenciales.estaCaducada(credencial, fechaReferencia);
+    }
+
+    public boolean estaProximaCaducar (Credencial credencial, LocalDate fechaReferencia, int umbral){
+
+        return gestorCaducidadCredenciales.estaProximaCaducar(credencial, fechaReferencia, umbral);
+    }
+
+
+    // Métodos relativos a exportación de credenciales -> Redirigidos a GestorExportacionCredenciales
+
+    public void exportarCredencialesCSV(List<Credencial> credenciales, Path rutaDestino) throws Exception{
+
+        gestorExportacionCredenciales.exportarCredencialesCSV(credenciales, rutaDestino);
+    }
+
+    // Métodos de validación -> Redirigidos a GestorValidacionCredenciales
+
+    public void validarConexion(Connection conexion){
+
+        gestorValidacionCredenciales.validarConexion(conexion);
+    }
+
+    public void validarBoveda(int idBoveda){
+
+        gestorValidacionCredenciales.validarBoveda(idBoveda);
+    }
+
+
+    public void validarCredencial(Credencial credencial){
+
+        gestorValidacionCredenciales.validarCredencial(credencial);
+    }
+
+    public void comprobarExisteBoveda(Connection conexion, int idBoveda) throws SQLException {
+
+        gestorValidacionCredenciales.comprobarExisteBoveda(conexion, idBoveda);
+    }
+
+    private void comprobarExisteCategoria(Connection conexion, int idCategoria) throws SQLException{
+
+        gestorValidacionCredenciales.comprobarExisteCategoria(conexion, idCategoria);
+    }
+
+    private void comprobarExisteCredencialEnBoveda(Connection conexion, int idCredencial, int idBoveda) throws SQLException{
+
+        gestorValidacionCredenciales.comprobarExisteCredencialEnBoveda(conexion, idCredencial, idBoveda);
+    }
+
+
+    // Métodos de actualización de credenciales -> Redirigidos a GestorActualizacionCredenciales
 
     public int crearCredencial(Credencial credencial, int idBoveda, Connection conexion) throws Exception{
 
@@ -270,251 +349,10 @@ public class GestorCredenciales {
 
     }
 
-    public List<Credencial> buscarCredenciales(Connection conexion, int idBoveda, String textoBusqueda) throws SQLException {
-
-        validarConexion(conexion);
-        validarBoveda(idBoveda);
-
-        comprobarExisteBoveda(conexion, idBoveda);
-
-        String textoNormalizado = textoBusqueda == null ? "" : textoBusqueda.trim();
-
-        if(textoNormalizado.isEmpty()){
-            return obtenerCredencialesDeBoveda(conexion, idBoveda);
-        }
-
-
-        String sentenciaBusqueda = """
-                SELECT
-                    c.id_credencial,
-                    c.url_identificador,
-                    c.username,
-                    c.password,
-                    c.destacada,
-                    c.anotaciones,
-                    c.caduca,
-                    c.fecha_caducidad,
-                    c.periodo_caducidad,
-                    c.ultimo_update,
-                    c.req_longitud,
-                    c.req_mayusculas,
-                    c.req_minusculas,
-                    c.req_digitos,
-                    c.req_especiales,
-                    c.id_categoria,
-                    cat.nombre AS nombre_categoria,
-                    cat.descripcion AS descripcion_categoria,
-                    cat.es_del_sistema
-                FROM credencial c
-                JOIN categoria cat ON c.id_categoria = cat.id_categoria
-                WHERE id_boveda = ?
-                AND(
-                    LOWER(c.url_identificador) LIKE ?
-                    OR LOWER(c.username) LIKE ?
-                    OR LOWER(COALESCE(c.anotaciones, '')) LIKE ?
-                    OR LOWER(cat.nombre) LIKE ?
-                )
-                ORDER BY c.username
-                """;
-
-        List<Credencial> resultados = new ArrayList<>();
-
-        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaBusqueda)){
-
-            String patronBusqueda = "%" + textoNormalizado + "%";
-
-            sentencia.setInt(1, idBoveda);
-            sentencia.setString(2, patronBusqueda);
-            sentencia.setString(3, patronBusqueda);
-            sentencia.setString(4, patronBusqueda);
-            sentencia.setString(5, patronBusqueda);
-
-            try(ResultSet setResultados = sentencia.executeQuery()){
-
-                while(setResultados.next()){
-
-                    resultados.add(mapearCredencial(setResultados));
-                }
-            }
-
-        }
-
-        return resultados;
-
-    }
-
-    private void validarConexion(Connection conexion){
-        if(conexion == null){
-            throw new IllegalArgumentException("La conexión no puede ser nula");
-        }
-    }
-
-    private void validarBoveda(int idBoveda){
-        if(idBoveda < 1){
-            throw new IllegalArgumentException("El id de la bóveda es incorrecto");
-        }
-    }
-
-    private void validarCredencial(Credencial credencial){
-        if(credencial == null){
-            throw new IllegalArgumentException("La credencial no puede ser nula");
-        }
-        if(credencial.getUrlIdentificador() == null || credencial.getUrlIdentificador().isEmpty()){
-            throw new IllegalArgumentException("El campo 'URL/Identificador' no puede estar vacío");
-        }
-        if(credencial.getUsername() == null || credencial.getUsername().isEmpty()){
-            throw new IllegalArgumentException("El campo 'Nombre de usuario' no puede estar vacío");
-        }
-        if(credencial.getPassword() == null || credencial.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("El campo 'Contraseña' no puede estar vacío");
-        }
-    }
-
-    private void comprobarExisteBoveda(Connection conexion, int idBoveda) throws SQLException {
-
-        String sentenciaComprobacion = "SELECT COUNT (*) from boveda WHERE id_boveda = ?";
-
-        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaComprobacion)){
-
-            sentencia.setInt(1, idBoveda);
-
-            try(ResultSet resultado  = sentencia.executeQuery()) {
-                if (resultado.next() && resultado.getInt(1) == 0) {
-                    throw new IllegalArgumentException("La bóveda indicada no existe");
-                }
-            }
-        }
-    }
-
-    private int obtenerIdCategoria(Categoria categoria){
-
-        if(categoria == null || categoria.getIdCategoria() <= 0){
-            return ID_CATEGORIA_OTROS;
-        }
-        return categoria.getIdCategoria();
-
-    }
-
-    private void comprobarExisteCategoria(Connection conexion, int idCategoria) throws SQLException{
-
-        String sentenciaComprobacion = "SELECT COUNT(*) FROM categoria WHERE id_categoria = ?";
-
-        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaComprobacion)){
-
-            sentencia.setInt(1, idCategoria);
-
-            try(ResultSet resultado = sentencia.executeQuery()){
-
-                if(resultado.next() && resultado.getInt(1)==0){
-                    throw new IllegalArgumentException("La categoría indicada no existe");
-                }
-            }
-        }
-    }
-
-    private int obtenerSiguienteIdCredencial(Connection conexion) throws SQLException{
-
-        String sentenciaSiguienteCredencial = "SELECT COALESCE(MAX(id_credencial), 0) + 1 FROM credencial";
-
-        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaSiguienteCredencial)){
-
-            ResultSet resultado = sentencia.executeQuery();
-
-            if(resultado.next()){
-                return resultado.getInt(1);
-            }
-
-        }
-        throw new SQLException("No se pudo obtener el id de la credencial");
-    }
-
-    private String normalizarTextoOpcional(String texto){
-
-        if(texto == null){
-            return null;
-        }
-
-        String textoLimpio = texto.trim();
-
-        if(textoLimpio.isEmpty()){
-            return null;
-        }
-
-        return textoLimpio;
-    }
-
-    private void comprobarExisteCredencialEnBoveda(Connection conexion, int idCredencial, int idBoveda) throws SQLException{
-
-        String sentenciaComprobacion = """
-                SELECT COUNT(*) FROM credencial
-                WHERE id_credencial = ? AND id_boveda = ?
-                """;
-
-        try(PreparedStatement sentecia = conexion.prepareStatement(sentenciaComprobacion)){
-
-            sentecia.setInt(1 , idCredencial);
-            sentecia.setInt(2, idBoveda);
-
-            try(ResultSet resultado = sentecia.executeQuery()){
-
-                if(resultado.next() && resultado.getInt(1) == 0){
-                    throw new IllegalArgumentException("La credencial indicada no existe en la bóveda");
-                }
-            }
-
-
-        }
-
-    }
-
-    private Credencial mapearCredencial(ResultSet setReultados) throws SQLException {
-
-        Credencial credencial = new Credencial();
-
-        credencial.setIdCredencial(setReultados.getInt("id_credencial"));
-        credencial.setUrlIdentificador(setReultados.getString("url_identificador"));
-        credencial.setUsername(setReultados.getString("username"));
-        credencial.setPassword(setReultados.getString("password"));
-        credencial.setDestacada((setReultados.getInt("destacada")) == 1);
-        credencial.setAnotaciones(setReultados.getString("anotaciones"));
-        credencial.setCaduca((setReultados.getInt("caduca"))==1);
-
-        String fechaCaducidad = setReultados.getString("fecha_caducidad");
-        if (fechaCaducidad != null){
-            credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad));
-        }
-
-        int periodoCaducidad = setReultados.getInt("periodo_caducidad");
-        if(!setReultados.wasNull()){
-            credencial.setPeriodoCaducidad(periodoCaducidad);
-        }
-
-        String fechaUltimoUpdate = setReultados.getString("ultimo_update");
-        if(fechaUltimoUpdate != null){
-            credencial.setFechaUltimoUpdate(LocalDate.parse(fechaUltimoUpdate));
-        }
-
-        credencial.setReqLongitud(setReultados.getInt("req_longitud"));
-        credencial.setReqMayusculas(setReultados.getInt("req_mayusculas"));
-        credencial.setReqMinusculas(setReultados.getInt("req_minusculas"));
-        credencial.setReqDigitos(setReultados.getInt("req_digitos"));
-        credencial.setReqEspeciales(setReultados.getInt("req_especiales"));
-
-        Categoria categoria = new Categoria();
-        categoria.setIdCategoria(setReultados.getInt("id_categoria"));
-        categoria.setNombre(setReultados.getString("nombre_categoria"));
-        categoria.setDescripcion(setReultados.getString("descripcion_categoria"));
-        categoria.setEsDelSistema(setReultados.getInt("es_del_sistema") == 1);
-
-        credencial.setCategoria(categoria);
-
-        return credencial;
-    }
-
     public void cambiarEstadoDestacada(Connection conexion,
-                                        int idCredencial,
-                                        int idBoveda,
-                                        boolean destacada) throws SQLException{
+                                       int idCredencial,
+                                       int idBoveda,
+                                       boolean destacada) throws SQLException{
 
         validarConexion(conexion);
 
@@ -543,96 +381,6 @@ public class GestorCredenciales {
 
         }
     }
-
-    public boolean estaCaducada(Credencial credencial, LocalDate fechaReferencia){
-
-        if(credencial == null){
-            throw new IllegalArgumentException("La credencial no puede ser nula");
-        }
-
-        if(fechaReferencia == null){
-
-            throw new IllegalArgumentException("La fecha de referencia no puede ser nula");
-        }
-
-        // Si la credencial NO caduca por definición
-        if(!credencial.isCaduca()){
-            return false;
-        }
-
-        LocalDate fechaCaducidad = calcularFechaCaducidadReal(credencial);
-
-        if(fechaCaducidad == null){
-            return false;
-        }
-
-        return !fechaCaducidad.isAfter(fechaReferencia);
-
-    }
-
-
-    public boolean estaProximaCaducar (Credencial credencial, LocalDate fechaReferencia, int umbral){
-
-        if(credencial == null){
-            throw new IllegalArgumentException("La credencial no puede ser nula");
-        }
-
-        if(fechaReferencia == null){
-            throw new IllegalArgumentException("La fecha de referencia no puede ser nula");
-        }
-
-        if(umbral < 0){
-            throw new IllegalArgumentException("El umbral de días no puede ser negativo");
-        }
-
-        if(!credencial.isCaduca()){
-            return false;
-        }
-
-        LocalDate fechaCaducidad = calcularFechaCaducidadReal(credencial);
-
-
-        if(fechaCaducidad == null){
-            return false;
-        }
-
-        if(estaCaducada(credencial, fechaReferencia)){
-            return false;
-        }
-
-        return !fechaCaducidad.isAfter(fechaReferencia.plusDays(umbral));
-
-    }
-
-
-    private LocalDate calcularFechaCaducidadReal(Credencial credencial){
-
-        if(credencial == null){
-            throw new IllegalArgumentException("La credencial no puede ser nula");
-        }
-
-        if(!credencial.isCaduca()){
-            return null;
-        }
-
-        if(credencial.getFechaCaducidad() != null){
-            return credencial.getFechaCaducidad();
-        }
-
-        // Si tiene un periodo de caducidad establecido
-        if(credencial.getPeriodoCaducidad() > 0 && credencial.getFechaUltimoUpdate() != null){
-
-            long dias = credencial.getPeriodoCaducidad() / 86400L; // Número de segundos en un día
-
-            return credencial.getFechaUltimoUpdate().plusDays(dias);
-
-        }
-
-        return null;
-
-
-    }
-
 
     public String actualizarPassword(Connection conexion, int idBoveda, Credencial credencial) throws SQLException{
 
@@ -681,7 +429,6 @@ public class GestorCredenciales {
         }
 
     }
-
 
     public void actualizarCredencial(Connection conexion, Boveda boveda, Credencial credencial) throws SQLException{
 
@@ -800,147 +547,6 @@ public class GestorCredenciales {
 
     }
 
-
-    private List<Credencial> obtenerCredencialesDeBoveda(Connection conexion, int idBoveda) throws SQLException{
-
-        String sentenciaConsulta = """
-                SELECT
-                    c.id_credencial,
-                    c.url_identificador,
-                    c.username,
-                    c.password,
-                    c.destacada,
-                    c.anotaciones,
-                    c.caduca,
-                    c.fecha_caducidad,
-                    c.periodo_caducidad,
-                    c.ultimo_update,
-                    c.req_longitud,
-                    c.req_mayusculas,
-                    c.req_minusculas,
-                    c.req_digitos,
-                    c.req_especiales,
-                    c.id_categoria,
-                    cat.nombre AS nombre_categoria,
-                    cat.descripcion AS descripcion_categoria,
-                    cat.es_del_sistema
-                FROM credencial c
-                JOIN categoria cat ON c.id_categoria = cat.id_categoria
-                WHERE c.id_boveda = ?
-                ORDER BY c.username
-                """;
-
-        List<Credencial> credenciales = new ArrayList<>();
-        try (PreparedStatement sentencia = conexion.prepareStatement(sentenciaConsulta)){
-
-            sentencia.setInt(1, idBoveda);
-
-            try(ResultSet setResultados = sentencia.executeQuery()){
-                while (setResultados.next()){
-                    credenciales.add(mapearCredencial(setResultados));
-                }
-            }
-
-
-        }
-
-        return credenciales;
-    }
-
-    public void exportarCredencialesCSV(List<Credencial> credenciales, Path rutaDestino) throws Exception{
-
-        if(credenciales == null){
-            throw new IllegalArgumentException("La lista de credenciales no puede ser null");
-        }
-        if(rutaDestino == null){
-            throw new IllegalArgumentException("Debes especificar una ruta para la exportación");
-        }
-        try(BufferedWriter bufferEscritura = Files.newBufferedWriter(rutaDestino, StandardCharsets.UTF_8)) {
-            bufferEscritura.write("id,url_identificador,username,password,categoria,destacada,caduca,fecha_caducidad,periodo_caducidad,ultimo_update,anotaciones");
-            bufferEscritura.newLine();
-            for (Credencial credencial : credenciales){
-                bufferEscritura.write(lineaCSV(credencial));
-                bufferEscritura.newLine();
-            }
-        }
-    }
-
-    private String lineaCSV(Credencial credencial){
-
-        String linea = "";
-
-        linea += escaparCadena(String.valueOf(credencial.getIdCredencial())) + ",";
-        linea += escaparCadena(credencial.getUrlIdentificador()) + ",";
-        linea += escaparCadena(credencial.getUsername()) + ",";
-        linea += escaparCadena(credencial.getPassword()) + ",";
-        linea += escaparCadena(credencial.getCategoria() == null ? "" : credencial.getCategoria().getNombre()) + ",";
-        linea += escaparCadena(credencial.isDestacada() ? "Sí" : "No") + ",";
-        linea += escaparCadena(credencial.isCaduca() ? "Sí" : "No") + ",";
-        linea += escaparCadena(credencial.getFechaCaducidad() == null ? "": credencial.getFechaCaducidad().toString()) + ",";
-        linea += escaparCadena(credencial.getPeriodoCaducidad() <= 0 ? "" : String.valueOf(credencial.getPeriodoCaducidad())) + ",";
-        linea += escaparCadena(credencial.getFechaUltimoUpdate() == null ? "" : credencial.getFechaUltimoUpdate().toString()) + ",";
-        linea += escaparCadena(credencial.getAnotaciones() == null ? "": credencial.getAnotaciones());
-        return linea;
-    }
-
-    private String escaparCadena(String cadena){
-
-        if(cadena == null){
-            return "";
-        }
-        String cadenaEscapada = cadena.replace("\"", "\"\"");
-
-        return "\"" + cadenaEscapada + "\"";
-
-    }
-
-    public List<Credencial> obtenerCredencialesPorCategoria(Connection conexion, int idCategoria) throws Exception{
-
-        String sentenciaObtencion = """
-                SELECT
-                    c.id_credencial,
-                    c.url_identificador,
-                    c.username,
-                    c.password,
-                    c.destacada,
-                    c.anotaciones,
-                    c.caduca,
-                    c.fecha_caducidad,
-                    c.periodo_caducidad,
-                    c.ultimo_update,
-                    c.req_longitud,
-                    c.req_mayusculas,
-                    c.req_minusculas,
-                    c.req_digitos,
-                    c.req_especiales,
-                    c.id_categoria,
-                    cat.nombre AS nombre_categoria,
-                    cat.descripcion AS descripcion_categoria,
-                    cat.es_del_sistema
-                FROM credencial c
-                JOIN categoria cat ON c.id_categoria = cat.id_categoria
-                WHERE c.id_categoria = ?
-                ORDER BY c.username
-                """;
-
-        List<Credencial> listaCredencialesFiltrada = new ArrayList<>();
-
-        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaObtencion)){
-
-            sentencia.setInt(1, idCategoria);
-
-            ResultSet setResultados = sentencia.executeQuery();
-
-            while (setResultados.next()){
-                listaCredencialesFiltrada.add(mapearCredencial(setResultados));
-            }
-
-        }
-
-
-        return listaCredencialesFiltrada;
-    }
-
     public void actualizarDestacada(Connection conexion, int idCredencial, boolean nuevoValor) throws Exception{
 
         validarConexion(conexion);
@@ -960,54 +566,47 @@ public class GestorCredenciales {
         }
     }
 
-    public List<Credencial> obtenerCredencialesDestacadas(Connection conexion, int idBoveda) throws  Exception{
 
-        validarConexion(conexion);
-        validarBoveda(idBoveda);
+    // Otros métodos auxiliares
 
-        String sentenciaObtencion = """
-                SELECT
-                    c.id_credencial,
-                    c.url_identificador,
-                    c.username,
-                    c.password,
-                    c.destacada,
-                    c.anotaciones,
-                    c.caduca,
-                    c.fecha_caducidad,
-                    c.periodo_caducidad,
-                    c.ultimo_update,
-                    c.req_longitud,
-                    c.req_mayusculas,
-                    c.req_minusculas,
-                    c.req_digitos,
-                    c.req_especiales,
-                    c.id_categoria,
-                    cat.nombre AS nombre_categoria,
-                    cat.descripcion AS descripcion_categoria,
-                    cat.es_del_sistema
-                FROM credencial c
-                JOIN categoria cat ON c.id_categoria = cat.id_categoria
-                WHERE c.id_boveda = ? 
-                    AND c.destacada = 1
-                ORDER BY c.username
-                """;
+    private int obtenerIdCategoria(Categoria categoria){
 
-            List<Credencial> listaDestacadas = new ArrayList<>();
+        if(categoria == null || categoria.getIdCategoria() <= 0){
+            return ID_CATEGORIA_OTROS;
+        }
+        return categoria.getIdCategoria();
 
-            try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaObtencion)){
-                sentencia.setInt(1, idBoveda);
+    }
 
-                try(ResultSet setResultados = sentencia.executeQuery()){
-                    while(setResultados.next()){
-                        listaDestacadas.add(mapearCredencial(setResultados));
-                    }
-                }
+    private int obtenerSiguienteIdCredencial(Connection conexion) throws SQLException{
 
+        String sentenciaSiguienteCredencial = "SELECT COALESCE(MAX(id_credencial), 0) + 1 FROM credencial";
+
+        try(PreparedStatement sentencia = conexion.prepareStatement(sentenciaSiguienteCredencial)){
+
+            ResultSet resultado = sentencia.executeQuery();
+
+            if(resultado.next()){
+                return resultado.getInt(1);
             }
 
-            return listaDestacadas;
+        }
+        throw new SQLException("No se pudo obtener el id de la credencial");
+    }
 
+    private String normalizarTextoOpcional(String texto){
+
+        if(texto == null){
+            return null;
+        }
+
+        String textoLimpio = texto.trim();
+
+        if(textoLimpio.isEmpty()){
+            return null;
+        }
+
+        return textoLimpio;
     }
 
 }

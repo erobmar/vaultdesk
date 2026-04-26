@@ -93,7 +93,7 @@ public class DialogoEditarCredencial {
                 String password = campoPassword.getText();
                 Categoria categoriaSeleccionada = comboBoxCategoria.getValue();
 
-                String fechaCaducidad = campoFechaCaducidad.getValue().toString() == null ? null : campoFechaCaducidad.getValue().toString();
+                String fechaCaducidad = campoFechaCaducidad.getValue() == null ? null : campoFechaCaducidad.getValue().toString();
 
                 if (url.isEmpty()) {
                     etiquetaError.setText("Debes especificar una URL o Identificador de sistema");
