@@ -14,4 +14,4 @@ Versión en pruebas. No usar todavía para credenciales reales críticas.
 ## Plataformas
 - Windows: app-image portable
 - Linux: app-image / tar.gz
-- macOS: pendiente o experimental
+- macOS: app-image experimental
