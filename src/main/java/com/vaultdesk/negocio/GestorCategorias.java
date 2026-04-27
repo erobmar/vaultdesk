@@ -180,7 +180,7 @@ public class GestorCategorias {
             throw new IllegalArgumentException("La categoría no puede ser nula");
         }
 
-        if(categoria.getNombre() == null){
+        if(categoria.getNombre() == null || categoria.getNombre().isBlank()){
             throw new IllegalArgumentException("El nombre de la categoría no puede ser nulo");
         }
     }
