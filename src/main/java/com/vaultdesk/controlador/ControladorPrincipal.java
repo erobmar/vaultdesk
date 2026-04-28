@@ -105,6 +105,12 @@ public class ControladorPrincipal {
             char[] passwordMaestra = dialogoPassword.mostrarYEsperar();
 
             try{
+                try{
+                    gestorPersistencia.abrirBovedaEnMemoria(rutaBoveda, passwordMaestra);
+                } catch (Exception e){
+                    mostrarMensajeError("Contraseña incorrecta", "No se han guardado los cambios");
+                    return false;
+                }
                 return guardarBovedaInterna(passwordMaestra);
             } finally {
                 Arrays.fill(passwordMaestra, '\0');
