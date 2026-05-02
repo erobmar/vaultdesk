@@ -7,15 +7,37 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+/**
+ * Clase auxiliar encargada de las operaciones sobre contraseñas de credenciales de una bóveda
+ * <p>
+ * Esta clase recibe del controlador principal las resposabilidades sobre operaciones relativas a generación de
+ * contraseñas en modo libre o actualizando una credencial.
+ * </p>
+ *
+ */
 public class ControladorPasswords {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public ControladorPasswords(ControladorPrincipal controladorPrincipal){
+    public ControladorPasswords(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public String generarPassword(int longitud, int mayusculas, int minusculas, int digitos, int especiales){
+    /**
+     * Genera una contraseña con los requisitos dados
+     *
+     * @param longitud   longitud mínima de la contraseña
+     * @param mayusculas número mínimo de mayúsculas de la contraseña
+     * @param minusculas número mínimo de minúsculas de la contraseña
+     * @param digitos    número mínimo de dígitos en la contraseña
+     * @param especiales número mínimo de caracteres especiales de la contraseña
+     * @return contraseña generada
+     * @see ControladorPrincipal#generarPassword(int, int, int, int, int)
+     * @see GestorPasswords#generarPassword(int, int, int, int, int)
+     *
+     *
+     */
+    public String generarPassword(int longitud, int mayusculas, int minusculas, int digitos, int especiales) {
 
         GestorPasswords gestorPasswords = new GestorPasswords();
 
@@ -24,9 +46,20 @@ public class ControladorPasswords {
 
     }
 
-    public void actualizarPasswordCredencial(Credencial credencial) throws  Exception{
+    /**
+     * Genera una contraseña para actualizar una credencial
+     *
+     * @param credencial credencial que se actualiza
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#actualizarPasswordCredencial(Credencial)
+     * @see ControladorPrincipal#editarCredencial(int, String, String, String, boolean, String, boolean, String, int, int, int, int, int, int, int)
+     * @see GestorPasswords#generarPassword(Credencial)
+     *
+     *
+     */
+    public void actualizarPasswordCredencial(Credencial credencial) throws Exception {
 
-        if(credencial == null){
+        if (credencial == null) {
             throw new IllegalArgumentException("Se debe especificar una credencial");
         }
 
@@ -61,7 +94,15 @@ public class ControladorPasswords {
 
     }
 
-    public boolean confirmarActualizacionPassword(){
+    /**
+     * Muestra un diálogo de confirmación para la actualizaciópn de contraseñas
+     *
+     * @return true si se confirma la actualización, false en caso contrario
+     * @see ControladorPrincipal#confirmarActualizacionPassword()
+     *
+     *
+     */
+    public boolean confirmarActualizacionPassword() {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
         alerta.setTitle("Actualizar contraseña");

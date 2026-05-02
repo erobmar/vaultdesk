@@ -5,15 +5,20 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+/**
+ * Vista para centralizar los diálogos
+ *
+ *
+ */
 public class VistaDialogos {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public VistaDialogos(ControladorPrincipal controladorPrincipal){
+    public VistaDialogos(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public void mostrarMensajeError(String titulo, String mensaje){
+    public void mostrarMensajeError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
@@ -30,7 +35,7 @@ public class VistaDialogos {
         alert.showAndWait();
     }
 
-    public ButtonType mostrarConfirmacionCierre(){
+    public ButtonType mostrarConfirmacionCierre() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Cerrar bóveda");

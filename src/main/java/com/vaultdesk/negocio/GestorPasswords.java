@@ -3,8 +3,15 @@ package com.vaultdesk.negocio;
 import com.vaultdesk.dominio.Credencial;
 
 import java.security.SecureRandom;
-import java.time.LocalDate;
 
+/**
+ * Clase encargada de gestionar las principales operaciones sobre contraseñas dentro de una bóveda
+ * <p>
+ * Esta clase actúa como punto de entrada de la capa de dominio para realizar operaciones de comprobación de cumplimiento
+ * de requisitos y generación de cotraseñas
+ * </p>
+ *
+ */
 public class GestorPasswords {
 
     private static final String MAYUSCULAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Se excluye la ñ por compatibilida internacional
@@ -21,12 +28,21 @@ public class GestorPasswords {
 
     private final SecureRandom random = new SecureRandom();
 
-    public boolean cumpleRequisitosPassword(String password, Credencial credencial){
+    /**
+     * Comprueba si una contraseña cumple los requisitos definidos por una credencial
+     *
+     * @param password   contraseña que se quiere comprobar
+     * @param credencial credencial de la que se tomarán los requisitos para la comprobación
+     * @return true si cumple los requisitos, false en caso contrario
+     * @see GestorPasswords#cumpleRequisitosPassword(String, int, int, int, int, int)
+     *
+     */
+    public boolean cumpleRequisitosPassword(String password, Credencial credencial) {
 
-        if(password == null){
+        if (password == null) {
             return false;
         }
-        if(credencial == null){
+        if (credencial == null) {
             throw new IllegalArgumentException("La credencial no puede ser nula");
         }
 
@@ -37,10 +53,23 @@ public class GestorPasswords {
                 credencial.getReqMinusculas(),
                 credencial.getReqDigitos(),
                 credencial.getReqEspeciales()
-                );
+        );
 
     }
 
+    /**
+     * Comprueba si una contraseña cumple unos requisitos específicos
+     *
+     * @param password      contraseña que se quiere comprobar
+     * @param reqLongitud   número mínimo de caracteres de la contraseña
+     * @param reqMayusculas número mínimo de mayúsculas de la contraseña
+     * @param reqMinusculas núnmero mínimo de minúsculas de la contraseña
+     * @param reqDigitos    número mínimo de dígitos de la contraseña
+     * @param reqEspeciales número mínimo de caracteres especiales de la contraseña
+     * @return true si la contraseña cumple con los requisitos, false en caso contrario
+     * @see GestorPasswords#cumpleRequisitosPassword(String, Credencial)
+     *
+     */
     public boolean cumpleRequisitosPassword(
             String password,
             int reqLongitud,
@@ -48,12 +77,12 @@ public class GestorPasswords {
             int reqMinusculas,
             int reqDigitos,
             int reqEspeciales
-    ){
+    ) {
 
-        if(password == null){
+        if (password == null) {
             return false;
         }
-        if(password.length() < Math.max(reqLongitud, 0)){
+        if (password.length() < Math.max(reqLongitud, 0)) {
             return false;
         }
 
@@ -64,34 +93,31 @@ public class GestorPasswords {
         int digitos = 0;
         int especiales = 0;
 
-        for(int i=0; i < password.length(); i++){
+        for (int i = 0; i < password.length(); i++) {
 
             char caracter = password.charAt(i);
 
-            if(Character.isUpperCase(caracter)){
+            if (Character.isUpperCase(caracter)) {
                 mayusculas++;
-            }
-            else if(Character.isLowerCase(caracter)){
+            } else if (Character.isLowerCase(caracter)) {
                 minusculas++;
-            }
-            else if(Character.isDigit(caracter)){
+            } else if (Character.isDigit(caracter)) {
                 digitos++;
-            }
-            else {
+            } else {
                 especiales++;
             }
 
         }
 
-        if(mayusculas < Math.max(reqMayusculas, 0)){
+        if (mayusculas < Math.max(reqMayusculas, 0)) {
             return false;
         }
 
-        if(minusculas < Math.max(reqMinusculas, 0)){
+        if (minusculas < Math.max(reqMinusculas, 0)) {
             return false;
         }
 
-        if(digitos < Math.max(reqDigitos, 0)){
+        if (digitos < Math.max(reqDigitos, 0)) {
             return false;
         }
 
@@ -100,9 +126,17 @@ public class GestorPasswords {
 
     }
 
-    public String generarPassword(Credencial credencial){
+    /**
+     * Genera una contraseña conforme a los requisitos de una credencial concreta
+     *
+     * @param credencial credencial de la que se toman los requisitos para la generación
+     * @return contraseña generada
+     * @see GestorPasswords#generarPassword(int, int, int, int, int)
+     *
+     */
+    public String generarPassword(Credencial credencial) {
 
-        if(credencial == null){
+        if (credencial == null) {
             throw new IllegalArgumentException("La credencial no puede ser nula");
         }
 
@@ -116,24 +150,25 @@ public class GestorPasswords {
         return generarPassword(longitud, mayusculas, minusculas, digitos, especiales);
     }
 
-    public String generarPasswordLibre(){
-        return generarPassword(
-                LONGITUD_POR_DEFECTO,
-                MAYUSCULAS_POR_DEFECTO,
-                MINUSCULAS_POR_DEFECTO,
-                DIGITOS_POR_DEFECTO,
-                ESPECIALES_POR_DEFECTO
-        );
-    }
-
-
+    /**
+     * Genera una contraseña conforme a unos requisitos específicos
+     *
+     * @param reqLongitud   número mínimo de caracteres de la contraseña
+     * @param reqMayusculas número mínimo de mayúsculas de la contraseña
+     * @param reqMinusculas número mínimo de minúsculas de la cotraseña
+     * @param reqDigitos    número mínimo de dígitos de la contraseña
+     * @param reqEspeciales númeor mínimo de caracteres especiales de la contraseña
+     * @return contraseña generada
+     * @see GestorPasswords#generarPassword(Credencial)
+     *
+     */
     public String generarPassword(
             int reqLongitud,
             int reqMayusculas,
             int reqMinusculas,
             int reqDigitos,
             int reqEspeciales
-    ){
+    ) {
 
         int longitud = normalizarLongitud(reqLongitud);
 
@@ -144,29 +179,29 @@ public class GestorPasswords {
 
         int sumaRequisitos = mayusculas + minusculas + digitos + especiales;
 
-        if(sumaRequisitos > longitud){
+        if (sumaRequisitos > longitud) {
             throw new IllegalArgumentException("La suma de requisitos supera la longitud de contraseña establecida");
         }
 
         char[] password = new char[longitud];
 
-        int indice  = 0;
+        int indice = 0;
 
-        for(int i = 0; i<mayusculas; i++){
+        for (int i = 0; i < mayusculas; i++) {
             password[indice++] = generarCaracterAleatorio(MAYUSCULAS);
         }
-        for(int i = 0; i<minusculas; i++){
+        for (int i = 0; i < minusculas; i++) {
             password[indice++] = generarCaracterAleatorio(MINUSCULAS);
         }
-        for(int i = 0; i<digitos; i++){
+        for (int i = 0; i < digitos; i++) {
             password[indice++] = generarCaracterAleatorio(DIGITOS);
         }
-        for(int i = 0; i<especiales; i++){
+        for (int i = 0; i < especiales; i++) {
             password[indice++] = generarCaracterAleatorio(ESPECIALES);
         }
 
         // Se generan caracteres aleatorios hasta completar la longitud del password
-        while (indice < longitud){
+        while (indice < longitud) {
             password[indice++] = generarCaracterAleatorio(TODOS_LOS_CARACTERES);
         }
 
@@ -178,18 +213,21 @@ public class GestorPasswords {
 
     }
 
+    /**
+     * Métodos que normalizan los campos que no se hayan establecido al valor por defecto del sistema
+     *
+     *
+     */
 
-
-    private int normalizarLongitud(int longitud){
-        if(longitud <= 0){
+    private int normalizarLongitud(int longitud) {
+        if (longitud <= 0) {
             return LONGITUD_POR_DEFECTO;
         }
         return longitud;
     }
 
-    // Si el requisito no está fijado en la credencial, lo establece a su valor por defecto
-    private int normalizarRequisito(int valor, int valorPorDefecto){
-        if(valor <= 0){
+    private int normalizarRequisito(int valor, int valorPorDefecto) {
+        if (valor <= 0) {
             return valorPorDefecto;
         }
 
@@ -197,9 +235,14 @@ public class GestorPasswords {
 
     }
 
-
-    // Toma una posición aleatorio del String del conjunto de caracteres seleccionado
-    private char generarCaracterAleatorio(String conjunto){
+    /**
+     * Métodos que generan caracteres para la generación de contraseñas:
+     * <p>
+     * - Toma una posición aleatoria del conjunto de caracteres pasado como parámetro
+     * - Aleatoriza el array de carateres final antes de devolver la contraseña ya generada
+     *
+     */
+    private char generarCaracterAleatorio(String conjunto) {
 
         int posicion = random.nextInt(conjunto.length());
         return conjunto.charAt(posicion);
@@ -207,11 +250,11 @@ public class GestorPasswords {
     }
 
 
-    private void aleatorizarArray(char[] password){
+    private void aleatorizarArray(char[] password) {
 
-        for(int i = password.length - 1; i > 0; i--){
+        for (int i = password.length - 1; i > 0; i--) {
 
-            int j = random.nextInt(i+1);
+            int j = random.nextInt(i + 1);
 
             char temporal = password[i];
             password[i] = password[j];

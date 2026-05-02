@@ -3,143 +3,89 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Idioma;
 import com.vaultdesk.dominio.TemaVisual;
+import com.vaultdesk.negocio.GestorAjustes;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase auxiliar encargada de las operaciones sobre ajustes de una bóveda
+ * <p>
+ * Esta clase recibe del controlador principal las resposabilidades sobre operaciones relativas a consulta y cambio de
+ * ajustes de la bóveda
+ * </p>
+ *
+ */
 public class ControladorAjustes {
 
     private final ControladorPrincipal controladorPrincipal;
+    private final GestorAjustes gestorAjustes;
 
-    public ControladorAjustes(ControladorPrincipal controladorPrincipal){
+    public ControladorAjustes(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
+        this.gestorAjustes = new GestorAjustes();
     }
 
-    public List<Idioma> obtenerIdiomas() throws Exception{
+    /**
+     * Obtiene la lista de idiomas disponibles en el sistema
+     *
+     * @return lista de idiomas
+     * @throws Exception si encuentra cualquier problema durante el proceso
+     * @see ControladorPrincipal#obtenerIdiomas()
+     * @see GestorAjustes#obtenerIdiomas(Connection)
+     *
+     *
+     */
+    public List<Idioma> obtenerIdiomas() throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
 
-
-        if(conexionActual == null || conexionActual.isClosed()){
-            throw new IllegalStateException("No hay una conexión abierta");
-        }
-
-        String sentenciaConsulta = """
-                SELECT id_idioma, nombre FROM idioma ORDER BY id_idioma
-                """;
-
-        List<Idioma> listaIdiomas = new ArrayList<>();
-
-        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
-
-            ResultSet setResultados = sentencia.executeQuery();
-
-            while(setResultados.next()){
-
-                Idioma idioma = new Idioma();
-                idioma.setIdIdioma(setResultados.getInt("id_idioma"));
-                idioma.setNombre(setResultados.getString("nombre"));
-
-                listaIdiomas.add(idioma);
-            }
-
-        }
-
-        return listaIdiomas;
+        return gestorAjustes.obtenerIdiomas(conexionActual);
 
     }
 
-    public List<TemaVisual> obtenerTemasVisuales() throws Exception{
+    /**
+     * Obtiene la lista de temas visuales disponibles en el sistema
+     *
+     * @return lista de temas visuales
+     * @throws Exception si encuentra cualquier problema durante el proceso
+     * @see ControladorPrincipal#obtenerTemasVisuales()
+     * @see GestorAjustes#obtenerTemasVisuales(Connection)
+     *
+     *
+     */
+    public List<TemaVisual> obtenerTemasVisuales() throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
-            throw new IllegalStateException("No hay ninguna conexión activa");
-        }
+        return gestorAjustes.obtenerTemasVisuales(conexionActual);
 
-        String sentenciaConsulta = """
-                SELECT id_tema_visual, nombre
-                FROM tema_visual
-                ORDER BY id_tema_visual
-                """;
-
-        List<TemaVisual> listaTemasVisuales = new ArrayList<>();
-
-        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
-
-            ResultSet setResultados = sentencia.executeQuery();
-
-            while (setResultados.next()){
-
-                TemaVisual temaVisual = new TemaVisual();
-                temaVisual.setIdTemaVisual(setResultados.getInt("id_tema_visual"));
-                temaVisual.setNombre(setResultados.getString("nombre"));
-
-                listaTemasVisuales.add(temaVisual);
-
-
-            }
-
-        }
-
-        return listaTemasVisuales;
     }
 
+    /**
+     * Actualiza los ajustes de una bóveda a los valores dados
+     *
+     * @param umbralAlerta  umbral en días de alerta para caducidad de credenciales
+     * @param accesibilidad indica si las opciones de accesibilidad están activadas o no
+     * @param idioma        idioma para la bóveda
+     * @param temaVisual    tema visual en el que se mostrará la aplicación
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#actualizarAjustesBoveda(int, boolean, Idioma, TemaVisual)
+     * @see GestorAjustes#actualizarAjustesBoveda(int, boolean, Idioma, TemaVisual, Connection, Boveda)
+     *
+     *
+     */
     public void actualizarAjustesBoveda(
             int umbralAlerta,
             boolean accesibilidad,
             Idioma idioma,
             TemaVisual temaVisual
-    ) throws Exception{
+    ) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
-            throw new IllegalStateException("No hay ninguna conexión abierta");
-        }
-        if(bovedaActual == null){
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
-        }
-        if(umbralAlerta < 0){
-            throw new IllegalArgumentException("El umbral de alerta no puede ser menor que 0");
-        }
-        if(idioma == null){
-            throw new IllegalStateException("Se debe seleccionar un idioma");
-        }
-        if(temaVisual == null){
-            throw new IllegalStateException("Se debe seleccionar un tema visual");
-        }
-
-        String sentenciaActualizacion = """
-                UPDATE boveda
-                SET umbral_alerta = ?,
-                    accesibilidad = ?,
-                    id_idioma = ?,
-                    id_tema_visual = ?
-                WHERE id_boveda = ?
-                """;
-
-        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaActualizacion)){
-
-            sentencia.setInt(1, umbralAlerta);
-            sentencia.setInt(2, accesibilidad ? 1 : 0);
-            sentencia.setInt(3, idioma.getIdIdioma());
-            sentencia.setInt(4, temaVisual.getIdTemaVisual());
-            sentencia.setInt(5, bovedaActual.getIdBoveda());
-
-            sentencia.executeUpdate();
-
-
-        }
-
-        bovedaActual.setUmbralAlerta(umbralAlerta);
-        bovedaActual.setAccesibilidad(accesibilidad);
-        bovedaActual.setTemaVisual(temaVisual);
-        bovedaActual.setModificadaSinGuardar(true);
+        gestorAjustes.actualizarAjustesBoveda(umbralAlerta, accesibilidad, idioma, temaVisual, conexionActual, bovedaActual);
 
         controladorPrincipal.actualizarTituloVentana();
 

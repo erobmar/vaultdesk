@@ -15,6 +15,10 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
+/**
+ * Vista para la pestaña 'Categorías'
+ *
+ */
 public class VistaCategorias {
 
     private final ControladorPrincipal controladorPrincipal;
@@ -23,12 +27,12 @@ public class VistaCategorias {
 
     private BorderPane root;
 
-    public VistaCategorias(ControladorPrincipal controladorPrincipal){
+    public VistaCategorias(ControladorPrincipal controladorPrincipal) {
 
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public BorderPane crearContenido(){
+    public BorderPane crearContenido() {
 
         root = new BorderPane();
 
@@ -68,18 +72,18 @@ public class VistaCategorias {
         Button botonEditarCategoria = new Button("Editar...");
         Button botonEliminarCategoria = new Button("Eliminar");
 
-        botonNuevaCategoria.setOnAction(e->{
+        botonNuevaCategoria.setOnAction(e -> {
 
             DialogoNuevaCategoria dialogoNuevaCategoria = new DialogoNuevaCategoria((Stage) root.getScene().getWindow());
 
-            dialogoNuevaCategoria.mostrar(datos ->{
-                if(datos == null){
+            dialogoNuevaCategoria.mostrar(datos -> {
+                if (datos == null) {
                     return;
                 }
-                try{
+                try {
                     controladorPrincipal.crearCategoria(datos.nombre(), datos.descripcion());
                     refrescarTabla(tablaCategorias);
-                } catch (Exception ex){
+                } catch (Exception ex) {
 
                     ex.printStackTrace();
                 }
@@ -87,29 +91,29 @@ public class VistaCategorias {
 
         });
 
-        botonEditarCategoria.setOnAction(e->{
+        botonEditarCategoria.setOnAction(e -> {
 
             Categoria seleccionada = tablaCategorias.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
-            if(seleccionada.getIdCategoria() == GestorCategorias.ID_CATEGORIA_OTROS || seleccionada.isDelSistema()){
+            if (seleccionada.getIdCategoria() == GestorCategorias.ID_CATEGORIA_OTROS || seleccionada.isDelSistema()) {
                 return;
             }
 
             DialogoEditarCategoria dialogoEditarCategoria = new DialogoEditarCategoria((Stage) root.getScene().getWindow());
 
-            dialogoEditarCategoria.mostrar(seleccionada, datos ->{
+            dialogoEditarCategoria.mostrar(seleccionada, datos -> {
 
-                if(datos == null){
+                if (datos == null) {
                     return;
                 }
-                try{
+                try {
                     controladorPrincipal.editarCategoria(datos.idCategoria(), datos.nombre(), datos.descripcion());
                     refrescarTabla(tablaCategorias);
                     tablaCategorias.getSelectionModel().clearSelection();
-                } catch (Exception exc){
+                } catch (Exception exc) {
                     exc.printStackTrace();
                 }
 
@@ -118,38 +122,38 @@ public class VistaCategorias {
 
         });
 
-        botonEliminarCategoria.setOnAction(e->{
+        botonEliminarCategoria.setOnAction(e -> {
 
             Categoria seleccionada = tablaCategorias.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
-            if(seleccionada.getIdCategoria() == GestorCategorias.ID_CATEGORIA_OTROS || seleccionada.isDelSistema()){
+            if (seleccionada.getIdCategoria() == GestorCategorias.ID_CATEGORIA_OTROS || seleccionada.isDelSistema()) {
                 return;
             }
 
             boolean confirmado = controladorPrincipal.confirmarEliminacionCategoria(seleccionada);
 
-            if(!confirmado){
+            if (!confirmado) {
                 return;
             }
-            try{
+            try {
                 controladorPrincipal.eliminarCategoria(seleccionada);
                 refrescarTabla(tablaCategorias);
                 tablaCategorias.getSelectionModel().clearSelection();
 
-            } catch (Exception exce){
+            } catch (Exception exce) {
                 exce.printStackTrace();
             }
         });
 
         HBox barraSuperior = new HBox(10, botonNuevaCategoria, botonEditarCategoria, botonEliminarCategoria);
 
-        try{
+        try {
             List<Categoria> categorias = controladorPrincipal.obtenerCategorias();
             tablaCategorias.setItems(FXCollections.observableArrayList(categorias));
-        } catch (Exception e){
+        } catch (Exception e) {
             root.setTop(barraSuperior);
             root.setCenter(new Label("Error al cargar las categorías" + e.getMessage()));
             return root;
@@ -160,10 +164,13 @@ public class VistaCategorias {
         return root;
 
 
-
     }
 
-    private void refrescarTabla(TableView<Categoria> tablaCategorias) throws Exception{
+    /**
+     * Refresca el contenido de la tabla para reflejar los últimos cambios
+     *
+     */
+    private void refrescarTabla(TableView<Categoria> tablaCategorias) throws Exception {
         List<Categoria> categoriasActualizadas = controladorPrincipal.obtenerCategorias();
         tablaCategorias.setItems(FXCollections.observableArrayList(categoriasActualizadas));
     }

@@ -3,7 +3,6 @@ package com.vaultdesk.ui;
 import com.vaultdesk.controlador.ControladorPrincipal;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -13,15 +12,20 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Vista para la pestaña 'Alertas'
+ *
+ *
+ */
 public class VistaAlertas {
 
-    private ControladorPrincipal controladorPrincipal;
+    private final ControladorPrincipal controladorPrincipal;
 
-    public VistaAlertas(ControladorPrincipal controladorPrincipal){
+    public VistaAlertas(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public BorderPane crearContenido(){
+    public BorderPane crearContenido() {
 
         BorderPane root = new BorderPane();
 
@@ -78,10 +82,10 @@ public class VistaAlertas {
         columnaFechaCaducidad.setPrefWidth(130);
         columnaDiasRestantes.setPrefWidth(100);
 
-        try{
+        try {
             List<AlertaCaducidad> listaAlertas = controladorPrincipal.obtenerAlertasCaducidad();
 
-            if(listaAlertas.isEmpty()){
+            if (listaAlertas.isEmpty()) {
                 root.setCenter(new Label("No hay credenciales caducadas ni próximas a caducar"));
                 return root;
             }
@@ -90,34 +94,31 @@ public class VistaAlertas {
 
             root.setCenter(tablaAlertas);
 
-        } catch (Exception e){
+        } catch (Exception e) {
 
             root.setCenter(new Label("Se produjo un error al cargar las alertas" + e.getMessage()));
 
         }
 
 
-
         return root;
     }
 
 
-    private String calcularDias(LocalDate fechaCaducidad){
+    private String calcularDias(LocalDate fechaCaducidad) {
 
         long dias = ChronoUnit.DAYS.between(LocalDate.now(), fechaCaducidad);
 
-        if(dias < 0){
+        if (dias < 0) {
 
             return "Hace " + Math.abs(dias) + " días";
         }
-        if(dias == 0){
+        if (dias == 0) {
             return "Hoy";
         }
 
         return "En " + Math.abs(dias) + " días";
-        // return String.valueOf(dias);
     }
-
 
 
 }

@@ -12,48 +12,58 @@ import java.util.function.Consumer;
 
 public class DialogoPassword {
 
-        private final Stage escena;
+    private final Stage escena;
 
-        public DialogoPassword(Stage escena){
-            this.escena = escena;
-        }
+    public DialogoPassword(Stage escena) {
+        this.escena = escena;
+    }
 
-        public void mostrar(String mensaje, Consumer<char[]> callback){
+    /**
+     * Muestra el diálogo para solicitar al usuario su contraseña maestra
+     *
+     *
+     */
+    public void mostrar(String mensaje, Consumer<char[]> callback) {
 
-            Dialog<char[]> dialogo = new Dialog<>();
+        Dialog<char[]> dialogo = new Dialog<>();
 
-            dialogo.initOwner(escena);
-            dialogo.initModality(Modality.APPLICATION_MODAL);
-            dialogo.setTitle("Contraseña maestra");
-            dialogo.setHeaderText(mensaje);
+        dialogo.initOwner(escena);
+        dialogo.initModality(Modality.APPLICATION_MODAL);
+        dialogo.setTitle("Contraseña maestra");
+        dialogo.setHeaderText(mensaje);
 
-            PasswordField password = new PasswordField();
-            password.setPromptText("Contraseña maestra");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Contraseña maestra");
 
-            VBox cajavertical = new VBox(10, new Label("Contraseña"), password);
-            dialogo.getDialogPane().setContent(cajavertical);
+        VBox cajavertical = new VBox(10, new Label("Contraseña"), password);
+        dialogo.getDialogPane().setContent(cajavertical);
 
-            ButtonType botonAceptar = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
-            ButtonType botonCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType botonAceptar = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType botonCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            dialogo.getDialogPane().getButtonTypes().addAll(botonAceptar, botonCancelar);
+        dialogo.getDialogPane().getButtonTypes().addAll(botonAceptar, botonCancelar);
 
-            dialogo.setResultConverter(
-                    buttonType -> {
-                        if(buttonType == botonAceptar){
-                            return password.getText().toCharArray();
-                        }
-                        return null;
+        dialogo.setResultConverter(
+                buttonType -> {
+                    if (buttonType == botonAceptar) {
+                        return password.getText().toCharArray();
                     }
-            );
+                    return null;
+                }
+        );
 
-            dialogo.setOnHidden(e -> callback.accept(dialogo.getResult()));
+        dialogo.setOnHidden(e -> callback.accept(dialogo.getResult()));
 
-            dialogo.show();
+        dialogo.show();
 
-        }
+    }
 
-    public char[] mostrarYEsperar(){
+    /**
+     * Muestra el diálogo para solicitar al usuario su contraseña maestra y espera respuesta del usuario
+     *
+     *
+     */
+    public char[] mostrarYEsperar() {
 
         final char[][] resultado = new char[1][];
 
@@ -67,12 +77,12 @@ public class DialogoPassword {
         Button botonAceptar = new Button("Aceptar");
         Button botonCancelar = new Button("Cancelar");
 
-        botonAceptar.setOnAction(e->{
+        botonAceptar.setOnAction(e -> {
             resultado[0] = campoPassword.getText().toCharArray();
             dialogo.close();
         });
 
-        botonCancelar.setOnAction(e->{
+        botonCancelar.setOnAction(e -> {
             resultado[0] = null;
             dialogo.close();
         });

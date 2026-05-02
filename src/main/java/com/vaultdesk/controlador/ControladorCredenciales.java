@@ -15,21 +15,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Clase auxiliar encargada de las operaciones sobre credenciales en una bóveda
+ * <p>
+ * Esta clase recibe del controlador principal las resposabilidades sobre operaciones relativas a la creación, edición y
+ * eliminación de credenciales, así como la obtención de listados de las mismas
+ * </p>
+ *
+ */
 public class ControladorCredenciales {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public  ControladorCredenciales(ControladorPrincipal controladorPrincipal){
+    public ControladorCredenciales(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
 
-    public List<Credencial> obtenerCredenciales() throws Exception{
+    public List<Credencial> obtenerCredenciales() throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay ninguna bóveda abierta");
         }
 
@@ -62,12 +70,12 @@ public class ControladorCredenciales {
                 ORDER BY c.username
                 """;
 
-        try(PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)){
+        try (PreparedStatement sentencia = conexionActual.prepareStatement(sentenciaConsulta)) {
 
             sentencia.setInt(1, bovedaActual.getIdBoveda());
 
-            try(ResultSet setResultados = sentencia.executeQuery()){
-                while(setResultados.next()){
+            try (ResultSet setResultados = sentencia.executeQuery()) {
+                while (setResultados.next()) {
 
                     Credencial credencial = new Credencial();
 
@@ -84,7 +92,7 @@ public class ControladorCredenciales {
                     // Comprobación de fecha de actualización
                     String ultimoUpdate = setResultados.getString("ultimo_update");
 
-                    if(ultimoUpdate != null){
+                    if (ultimoUpdate != null) {
 
                         credencial.setFechaUltimoUpdate(LocalDate.parse(ultimoUpdate));
                     }
@@ -92,7 +100,7 @@ public class ControladorCredenciales {
                     // Comprobación de fecha de caducidad
                     String fechaCaducidad = setResultados.getString("fecha_caducidad");
 
-                    if(fechaCaducidad != null){
+                    if (fechaCaducidad != null) {
 
                         credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad));
                     }
@@ -100,7 +108,7 @@ public class ControladorCredenciales {
                     // Comprobación de periodo de caducidad
                     int periodoCaducidad = setResultados.getInt("periodo_caducidad");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setPeriodoCaducidad(periodoCaducidad);
                     }
@@ -108,7 +116,7 @@ public class ControladorCredenciales {
                     // Comprobación de requisito de longitud
                     int reqLongitud = setResultados.getInt("req_longitud");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setReqLongitud(reqLongitud);
                     }
@@ -116,7 +124,7 @@ public class ControladorCredenciales {
                     // Comprobación de requisito de mayúsculas
                     int reqMayusculas = setResultados.getInt("req_mayusculas");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setReqMayusculas(reqMayusculas);
                     }
@@ -124,7 +132,7 @@ public class ControladorCredenciales {
                     // Comprobación de requisito de minúsculas
                     int reqMinusculas = setResultados.getInt("req_minusculas");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setReqMinusculas(reqMinusculas);
                     }
@@ -132,7 +140,7 @@ public class ControladorCredenciales {
                     // Comprobación de requisito de dígitos
                     int reqDigitos = setResultados.getInt("req_digitos");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setReqDigitos(reqDigitos);
                     }
@@ -140,7 +148,7 @@ public class ControladorCredenciales {
                     // Comprobación de requisito de caracteres espciales
                     int reqEspeciales = setResultados.getInt("req_especiales");
 
-                    if(!setResultados.wasNull()){
+                    if (!setResultados.wasNull()) {
 
                         credencial.setReqEspeciales(reqEspeciales);
                     }
@@ -164,6 +172,29 @@ public class ControladorCredenciales {
 
     }
 
+    /**
+     * Crea una credencial con los parámetros recibidos
+     *
+     * @param urlIdentificador URL o identificador de la credencial
+     * @param username         nombre de usuario
+     * @param password         contraseña
+     * @param destacada        true si es una credencial destacada, false en caso contrario
+     * @param anotaciones      observaciones sobre la credencial
+     * @param caduca           true si la contraseña caduca, false en caso contrario
+     * @param fechaCaducidad   fecha de caducidad de la contraseña
+     * @param periodoCaducidad periodo en días tras el cual la contraseña caduca
+     * @param reqLongitud      número mínimo de caracteres de la contraseña
+     * @param reqMayusculas    número mínimo de mayúsculas de la contraseña
+     * @param reqMinusculas    número mínimo de minúsculas de la contraseña
+     * @param reqDigitos       número mínimo de dígitos en la contraseña
+     * @param reqEspeciales    número mínimo de carateres especiales de la contraseña
+     * @param idCategoria      identificador de la categoría a la que pertenece la credencial
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#crearCredencial(String, String, String, boolean, String, boolean, String, int, int, int, int, int, int, int)
+     * @see GestorCredenciales#crearCredencial(Credencial, int, Connection)
+     *
+     *
+     */
     public void crearCredencial(
             String urlIdentificador,
             String username,
@@ -179,16 +210,16 @@ public class ControladorCredenciales {
             int reqDigitos,
             int reqEspeciales,
             int idCategoria
-    ) throws Exception{
+    ) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay una bóveda abierta");
         }
 
-        if(bovedaActual == null){
+        if (bovedaActual == null) {
             throw new IllegalStateException("No hay ninguna bóveda activa");
         }
 
@@ -198,7 +229,6 @@ public class ControladorCredenciales {
         Credencial credencial = new Credencial();
 
 
-
         credencial.setUrlIdentificador(urlIdentificador);
         credencial.setUsername(username);
         credencial.setPassword(password);
@@ -206,7 +236,7 @@ public class ControladorCredenciales {
         credencial.setAnotaciones(anotaciones == null || anotaciones.isBlank() ? null : anotaciones.trim());
         credencial.setCaduca(caduca);
 
-        if(caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()){
+        if (caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()) {
             credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad.trim()));
         } else {
             credencial.setFechaCaducidad(null);
@@ -214,7 +244,7 @@ public class ControladorCredenciales {
 
         credencial.setPeriodoCaducidad(Math.max(periodoCaducidad, 0));
 
-        if(caduca && periodoCaducidad > 0){
+        if (caduca && periodoCaducidad > 0) {
             credencial.setFechaUltimoUpdate(LocalDate.now());
         } else {
             credencial.setFechaUltimoUpdate(null);
@@ -238,7 +268,30 @@ public class ControladorCredenciales {
 
     }
 
-
+    /**
+     * Actualiza una credencial con los parámetros indicados
+     *
+     * @param idCredencial     identificador de la credencial que se quiere actualizar
+     * @param urlIdentificador URL o identificador de la credencial
+     * @param username         nombre de usuario
+     * @param password         contraseña
+     * @param destacada        true si es una credencial destacada, false en caso contrario
+     * @param anotaciones      observaciones sobre la credencial
+     * @param caduca           true si la contraseña caduca, false en caso contrario
+     * @param fechaCaducidad   fecha de caducidad de la contraseña
+     * @param periodoCaducidad periodo en días tras el cual la contraseña caduca
+     * @param reqLongitud      número mínimo de caracteres de la contraseña
+     * @param reqMayusculas    número mínimo de mayúsculas de la contraseña
+     * @param reqMinusculas    número mínimo de minúsculas de la contraseña
+     * @param reqDigitos       número mínimo de dígitos en la contraseña
+     * @param reqEspeciales    número mínimo de carateres especiales de la contraseña
+     * @param idCategoria      identificador de la categoría a la que pertenece la credencial
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#editarCredencial(int, String, String, String, boolean, String, boolean, String, int, int, int, int, int, int, int)
+     * @see GestorCredenciales#editarCredencial(Connection, Boveda, Credencial)
+     *
+     *
+     */
     public void editarCredencial(
             int idCredencial,
             String urlIdentificador,
@@ -255,15 +308,15 @@ public class ControladorCredenciales {
             int reqDigitos,
             int reqEspeciales,
             int idCategoria
-    ) throws Exception{
+    ) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay ninguna bóveda abierta");
         }
-        if(bovedaActual == null){
+        if (bovedaActual == null) {
             throw new IllegalStateException("No hay ninguna bóveda activa");
         }
 
@@ -277,7 +330,7 @@ public class ControladorCredenciales {
         credencial.setAnotaciones(anotaciones == null || anotaciones.isBlank() ? null : anotaciones.trim());
         credencial.setCaduca(caduca);
 
-        if(caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()){
+        if (caduca && fechaCaducidad != null && !fechaCaducidad.isBlank()) {
             credencial.setFechaCaducidad(LocalDate.parse(fechaCaducidad.trim()));
         } else {
             credencial.setFechaCaducidad(null);
@@ -285,7 +338,7 @@ public class ControladorCredenciales {
 
         credencial.setPeriodoCaducidad(periodoCaducidad);
 
-        if(caduca && periodoCaducidad > 0){
+        if (caduca && periodoCaducidad > 0) {
             credencial.setFechaUltimoUpdate(LocalDate.now());
         } else {
             credencial.setFechaUltimoUpdate(null);
@@ -302,22 +355,32 @@ public class ControladorCredenciales {
         credencial.setCategoria(categoria);
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
-        gestorCredenciales.actualizarCredencial(conexionActual, bovedaActual, credencial);
+        gestorCredenciales.editarCredencial(conexionActual, bovedaActual, credencial);
 
         bovedaActual.setModificadaSinGuardar(true);
         controladorPrincipal.actualizarTituloVentana();
     }
 
-    public void eliminarCredencial(Credencial credencial) throws Exception{
+    /**
+     * Elimina una credencial
+     *
+     * @param credencial la credencial a eliminar
+     * @throws Exception si encuentra algún error durante el proceso
+     * @see ControladorPrincipal#eliminarCredencial(Credencial)
+     * @see GestorCredenciales#eliminarCredencial(Connection, int, Credencial)
+     *
+     *
+     */
+    public void eliminarCredencial(Credencial credencial) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No existe ninguna bóveda abierta");
         }
 
-        if(bovedaActual == null){
+        if (bovedaActual == null) {
             throw new IllegalStateException("No existe ninguna bóveda abierta");
         }
 
@@ -330,7 +393,14 @@ public class ControladorCredenciales {
 
     }
 
-    public boolean confirmarEliminacionCredencial(){
+    /**
+     * Muestra un diálogo para confirmar la eliminación de una credencial
+     *
+     * @return true si la credencial se puede eliminar, false en caso contrario
+     * @see ControladorPrincipal#confirmarEliminacionCredencial()
+     *
+     */
+    public boolean confirmarEliminacionCredencial() {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
         alerta.setTitle("Eliminar credencial");
@@ -343,11 +413,22 @@ public class ControladorCredenciales {
 
     }
 
-    public List<Credencial> obtenerCredencialesPorCategoria(int idCategoria) throws Exception{
+    /**
+     * Obtiene un listado de todas las credenciales de una bóveda que pertenecen a una categoría dada
+     *
+     * @param idCategoria identificador de la categoría por la que se va a filtrar
+     * @return lista de credenciales pertenecientes a la categoría dada
+     * @throws Exception si encuentra algún problema duratne el proceso
+     * @see ControladorPrincipal#obtenerCredencialesPorCategoria(int)
+     * @see GestorCredenciales#obtenerCredencialesPorCategoria(Connection, int)
+     *
+     *
+     */
+    public List<Credencial> obtenerCredencialesPorCategoria(int idCategoria) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay ninguna conexión activa");
         }
 
@@ -355,12 +436,22 @@ public class ControladorCredenciales {
         return gestorCredenciales.obtenerCredencialesPorCategoria(conexionActual, idCategoria);
     }
 
-    public void toggleDestacada(Credencial credencial) throws Exception{
+    /**
+     * Cambia el estado de 'destacada' de una credencial dada
+     *
+     * @param credencial credencial a la que se desea cambiar el estado de 'destacada'
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#toggleDestacada(Credencial)
+     * @see GestorCredenciales#actualizarDestacada(Connection, int, boolean)
+     *
+     *
+     */
+    public void toggleDestacada(Credencial credencial) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay una conexión activa");
         }
 
@@ -374,15 +465,24 @@ public class ControladorCredenciales {
 
     }
 
+    /**
+     * Obtiene un listado de las credenciales de una bóveda marcadas como 'destacada'
+     *
+     * @return lista de credenciales destacadas
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#obtenerCredencialesDestacadas()
+     * @see GestorCredenciales#obtenerCredencialesDestacadas(Connection, int)
+     *
+     */
     public List<Credencial> obtenerCredencialesDestacadas() throws Exception {
 
-        Connection conexionActual = controladorPrincipal.getConexionActual();;
+        Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if(conexionActual == null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay ninguna conexión activa");
         }
-        if(bovedaActual == null){
+        if (bovedaActual == null) {
             throw new IllegalStateException("No hay ninguna bóveda abierta");
         }
 
@@ -392,15 +492,26 @@ public class ControladorCredenciales {
 
     }
 
-    public List<Credencial> buscarCredencial(String textoBusqueda) throws Exception{
+    /**
+     * Obtiene un listado de las credenciales de una bóveda que cumplen un determinado criterio de búsqueda
+     *
+     * @param textoBusqueda criterio de búsqueda
+     * @return lista de credenciale que cumplen el criterio
+     * @throws Exception si encuentra algún problema durante el proceso
+     * @see ControladorPrincipal#buscarCredencial(String)
+     * @see GestorCredenciales#buscarCredenciales(Connection, int, String)
+     *
+     *
+     */
+    public List<Credencial> buscarCredencial(String textoBusqueda) throws Exception {
 
         Connection conexionActual = controladorPrincipal.getConexionActual();
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
-        if (conexionActual==null || conexionActual.isClosed()){
+        if (conexionActual == null || conexionActual.isClosed()) {
             throw new IllegalStateException("No hay ninguna conexión activa");
         }
-        if(bovedaActual == null){
+        if (bovedaActual == null) {
             throw new IllegalStateException("No hay ninguna bóveda activa");
         }
 

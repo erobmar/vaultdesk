@@ -11,19 +11,22 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 import javax.swing.*;
-import java.security.cert.Extension;
 import java.util.List;
 
+/**
+ * Vista para la pestaña de ajustes
+ *
+ */
 public class VistaAjustes {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public VistaAjustes(ControladorPrincipal controladorPrincipal){
+    public VistaAjustes(ControladorPrincipal controladorPrincipal) {
 
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public BorderPane crearContenido(){
+    public BorderPane crearContenido() {
 
         BorderPane root = new BorderPane();
 
@@ -41,7 +44,7 @@ public class VistaAjustes {
 
         etiquetaError.setStyle("-fx-text-fill: red;");
 
-        try{
+        try {
 
             List<Idioma> listaIdiomas = controladorPrincipal.obtenerIdiomas();
             List<TemaVisual> listaTemasVisuales = controladorPrincipal.obtenerTemasVisuales();
@@ -51,13 +54,13 @@ public class VistaAjustes {
 
             cargarValoresActuales(campoUmbralAlerta, checkBoxAccesibilidad, comboBoxIdiomas, comboBoxTemasVisuales);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             root.setCenter(new Label("Error al cargar ajustes" + e.getMessage()));
             return root;
         }
 
-        botonGuardar.setOnAction(e->{
-            try{
+        botonGuardar.setOnAction(e -> {
+            try {
                 int umbral = Integer.parseInt(campoUmbralAlerta.getText().trim());
 
                 controladorPrincipal.actualizarAjustesBoveda(
@@ -69,14 +72,14 @@ public class VistaAjustes {
 
                 etiquetaError.setText("");
 
-            } catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 etiquetaError.setText("El umbral de alerta debe ser un número entero");
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 etiquetaError.setText("Error: " + ex.getMessage());
             }
         });
 
-        botonCancelar.setOnAction(e->{
+        botonCancelar.setOnAction(e -> {
             cargarValoresActuales(campoUmbralAlerta, checkBoxAccesibilidad, comboBoxIdiomas, comboBoxTemasVisuales);
             etiquetaError.setText("");
         });
@@ -102,7 +105,7 @@ public class VistaAjustes {
 
         parrilla.add(botonGuardar, 0, fila);
         parrilla.add(botonCancelar, 1, fila++);
-        parrilla.add(etiquetaError, 0, fila,2 ,1);
+        parrilla.add(etiquetaError, 0, fila, 2, 1);
 
         root.setCenter(parrilla);
 
@@ -111,53 +114,61 @@ public class VistaAjustes {
 
     }
 
-
+    /**
+     * Carga en los campos de la vista los valores actuales de configuración
+     *
+     */
     private void cargarValoresActuales(
             TextField campoUmbralAlerta,
             CheckBox checkBoxAccesibilidad,
             ComboBox<Idioma> comboBoxIdiomas,
             ComboBox<TemaVisual> comboBoxTemasVisuales
-    ){
+    ) {
 
         Boveda boveda = controladorPrincipal.getBovedaActual();
 
-        if(boveda == null){
+        if (boveda == null) {
             return;
         }
 
         campoUmbralAlerta.setText(String.valueOf(boveda.getUmbralAlerta()));
         checkBoxAccesibilidad.setSelected(boveda.isAccesibilidad());
 
-        if(boveda.getIdioma() != null){
+        if (boveda.getIdioma() != null) {
             seleccionarIdioma(comboBoxIdiomas, boveda.getIdioma().getIdIdioma());
         }
-        if(boveda.getTemaVisual() != null){
+        if (boveda.getTemaVisual() != null) {
             seleccionarTemaVisual(comboBoxTemasVisuales, boveda.getTemaVisual().getIdTemaVisual());
         }
 
     }
 
 
-    private void seleccionarIdioma(ComboBox<Idioma> comboBoxIdiomas, int idIdioma){
+    /**
+     * Selecciona un idioma
+     *
+     */
+    private void seleccionarIdioma(ComboBox<Idioma> comboBoxIdiomas, int idIdioma) {
 
-        for (Idioma idioma : comboBoxIdiomas.getItems()){
-            if(idioma.getIdIdioma() == idIdioma){
+        for (Idioma idioma : comboBoxIdiomas.getItems()) {
+            if (idioma.getIdIdioma() == idIdioma) {
                 comboBoxIdiomas.getSelectionModel().select(idIdioma);
                 return;
             }
         }
     }
 
-    private void seleccionarTemaVisual(ComboBox<TemaVisual> comboBoxTemaVisual, int idTemaVisual){
+    /**
+     * Selecciona un tema visual
+     *
+     */
+    private void seleccionarTemaVisual(ComboBox<TemaVisual> comboBoxTemaVisual, int idTemaVisual) {
 
-        for (TemaVisual temaVisual : comboBoxTemaVisual.getItems()){
-            if(temaVisual.getIdTemaVisual() == idTemaVisual){
+        for (TemaVisual temaVisual : comboBoxTemaVisual.getItems()) {
+            if (temaVisual.getIdTemaVisual() == idTemaVisual) {
                 comboBoxTemaVisual.getSelectionModel().select(idTemaVisual);
                 return;
             }
         }
     }
-
-
-
 }

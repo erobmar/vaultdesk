@@ -8,15 +8,19 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 
+/**
+ * Vista para la ventana principal del sistema, una vez se ha abierto una bóveda
+ *
+ */
 public class VistaPrincipal {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public VistaPrincipal(ControladorPrincipal controladorPrincipal){
+    public VistaPrincipal(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public Scene crearEscena(){
+    public Scene crearEscena() {
 
         BorderPane root = new BorderPane();
 
@@ -30,10 +34,10 @@ public class VistaPrincipal {
         itemCerrarBoveda.setOnAction(e -> controladorPrincipal.cerrarBoveda());
 
         MenuItem itemGuardarBoveda = new MenuItem("Guardar bóveda...");
-        itemGuardarBoveda.setOnAction(e-> controladorPrincipal.guardarBoveda());
+        itemGuardarBoveda.setOnAction(e -> controladorPrincipal.guardarBoveda());
 
         MenuItem itemExportarACsv = new MenuItem("Exportar credendiales a CSV...");
-        itemExportarACsv.setOnAction(e-> exportarCredenciales(root));
+        itemExportarACsv.setOnAction(e -> exportarCredenciales(root));
 
         MenuItem itemSalir = new MenuItem("Salir");
         itemSalir.setOnAction(e -> controladorPrincipal.salirAplicacion());
@@ -67,7 +71,7 @@ public class VistaPrincipal {
         Tab pestanaCredenciales = new Tab("Credenciales", vistaCredenciales.crearContenido());
         Tab pestanaCategorias = new Tab("Categorias", vistaCategorias.crearContenido());
         Tab pestanaGenerador = new Tab("Generador", vistaGenerador.crearContenido());
-        Tab pestanaAlertas = new Tab("Alertas" , vistaAlertas.crearContenido());
+        Tab pestanaAlertas = new Tab("Alertas", vistaAlertas.crearContenido());
         Tab pestanaAjustes = new Tab("Ajustes", vistaAjustes.crearContenido());
 
         pestanaCredenciales.setClosable(false);
@@ -83,12 +87,12 @@ public class VistaPrincipal {
                 pestanaAlertas,
                 pestanaAjustes);
 
-        panelPestanas.getSelectionModel().selectedItemProperty().addListener((obs, anterior, actual) ->{
-            if(actual == pestanaCredenciales){
+        panelPestanas.getSelectionModel().selectedItemProperty().addListener((obs, anterior, actual) -> {
+            if (actual == pestanaCredenciales) {
                 pestanaCredenciales.setContent(new VistaCredenciales(controladorPrincipal).crearContenido());
             }
 
-            if(actual == pestanaAlertas){
+            if (actual == pestanaAlertas) {
                 VistaAlertas nuevaVistaAlertas = new VistaAlertas(controladorPrincipal);
                 pestanaAlertas.setContent(nuevaVistaAlertas.crearContenido());
             }
@@ -97,15 +101,15 @@ public class VistaPrincipal {
         root.setTop(menu);
         root.setCenter(panelPestanas);
 
-        return new Scene(root,1050, 800);
+        return new Scene(root, 1050, 800);
 
 
     }
 
-    private void exportarCredenciales(BorderPane root){
+    private void exportarCredenciales(BorderPane root) {
         boolean confirmado = controladorPrincipal.confirmarExportacion();
 
-        if(!confirmado){
+        if (!confirmado) {
             return;
         }
 
@@ -118,11 +122,11 @@ public class VistaPrincipal {
 
         File archivoSalida = selectorArchivos.showSaveDialog(root.getScene().getWindow());
 
-        if(archivoSalida == null){
+        if (archivoSalida == null) {
             return;
         }
 
-        try{
+        try {
             controladorPrincipal.exportarACsv(archivoSalida.toPath());
 
             Alert alerta = new Alert(Alert.AlertType.INFORMATION);
@@ -130,7 +134,7 @@ public class VistaPrincipal {
             alerta.setHeaderText(null);
             alerta.setContentText("Se ha completado la exportación correctamente");
             alerta.showAndWait();
-        } catch (Exception e){
+        } catch (Exception e) {
 
             Alert alerta = new Alert(Alert.AlertType.ERROR);
             alerta.setTitle("Error en la exportación");

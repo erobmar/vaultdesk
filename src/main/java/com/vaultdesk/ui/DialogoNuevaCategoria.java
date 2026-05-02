@@ -19,11 +19,16 @@ public class DialogoNuevaCategoria {
 
     private final Stage owner;
 
-    public DialogoNuevaCategoria(Stage owner){
+    public DialogoNuevaCategoria(Stage owner) {
         this.owner = owner;
     }
 
-    public void mostrar(Consumer<GestorCategorias.DatosNuevaCategoria> callback){
+    /**
+     * Muestra el diálogo de creación de una nueva categoría
+     *
+     *
+     */
+    public void mostrar(Consumer<GestorCategorias.DatosNuevaCategoria> callback) {
 
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
@@ -41,12 +46,12 @@ public class DialogoNuevaCategoria {
         Button botonAceptar = new Button("Aceptar");
         Button botonCancelar = new Button("Cancelar");
 
-        botonAceptar.setOnAction(e ->{
+        botonAceptar.setOnAction(e -> {
 
             String nombreCategoria = campoNombre.getText() == null ? "" : campoNombre.getText().trim();
-            String descripcionCategoria = campoDescripcion.getText() == null ? "": campoDescripcion.getText().trim();
+            String descripcionCategoria = campoDescripcion.getText() == null ? "" : campoDescripcion.getText().trim();
 
-            if(nombreCategoria.isEmpty()){
+            if (nombreCategoria.isEmpty()) {
                 etiquetaError.setText("Debes indicar un nombre para la categoría");
                 return;
             }
@@ -55,10 +60,9 @@ public class DialogoNuevaCategoria {
             callback.accept(new GestorCategorias.DatosNuevaCategoria(nombreCategoria, descripcionCategoria));
 
 
-
         });
 
-        botonCancelar.setOnAction(e->{
+        botonCancelar.setOnAction(e -> {
             callback.accept(null);
             dialogo.close();
         });
@@ -70,7 +74,6 @@ public class DialogoNuevaCategoria {
 
         campoDescripcion.setPrefWidth(200);
         campoNombre.setPrefWidth(200);
-
 
 
         int fila = 0;
@@ -92,7 +95,6 @@ public class DialogoNuevaCategoria {
 
 
     }
-
 
 
 }

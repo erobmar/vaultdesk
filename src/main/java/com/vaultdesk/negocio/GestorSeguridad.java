@@ -9,6 +9,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * Clase encargada de gestionar todos los aspectos relacionados con seguridad y la criptografía de la aplicación
+ * <p>
+ * Esta clase centraliza los métodos de cifrado y descifrado de la bóveda, así como todos los métodos auxiliares
+ * necesarios para generar el salt, el vector de inicialización y derivar la clave maestra
+ * </p>
+ *
+ */
 public class GestorSeguridad {
 
     // Parámetros de configuración para la derivación de clave
@@ -24,8 +32,9 @@ public class GestorSeguridad {
      * Genera un salt aleatorio
      *
      * @return salt de 16 bytes
-     * */
-    public byte[] generarSalt(){
+     *
+     */
+    public byte[] generarSalt() {
 
         byte[] salt = new byte[LONGITUD_SALT];
 
@@ -38,12 +47,13 @@ public class GestorSeguridad {
     /**
      * Deriva una clave criptográfica a partir de una contraseña maestra y salt
      *
-     * @param passwordMaestra - Contraseña maestra del usuario
-     * @param salt - valor aleatorio
+     * @param passwordMaestra contraseña maestra
+     * @param salt            valor aleatorio de 16 bytes
      * @return array de bytes con la clave derivada
      * @throws NoSuchAlgorithmException si el algoritmo no está disponible
-     * @throws InvalidKeySpecException si la especificación de clave no es válida
-     * */
+     * @throws InvalidKeySpecException  si las especificaciones de clave no son válidas
+     *
+     */
     public byte[] derivarClave(char[] passwordMaestra, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] claveDerivada;
 
@@ -66,8 +76,9 @@ public class GestorSeguridad {
      * Genera un IV (Vector de inicialización) para AES
      *
      * @return vector de incialización de 12 bytes
-     * */
-    public byte[] generarIV(){
+     *
+     */
+    public byte[] generarIV() {
         byte[] vectorInicializacion = new byte[LONGITUD_IV];
 
         SecureRandom random = new SecureRandom();
@@ -79,12 +90,14 @@ public class GestorSeguridad {
     /**
      * Cifra un conjunto de datos, con la clave y vector de inicialización dados
      *
-     * @param datos - array de bytes con los datos a encriptar
-     * @param claveDerivada - clave de cifrado derivada mediante contraseña maestra
-     * @param vectorInicializacion - Vector de inicialización
+     * @param datos                array de bytes con los datos a encriptar
+     * @param claveDerivada        clave de cifrado derivada mediante contraseña maestra
+     * @param vectorInicializacion vector de inicialización
      * @return datos cifrados
-     * */
-    public byte[] cifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception{
+     * @throws Exception si la operación de cifrado falla
+     *
+     */
+    public byte[] cifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception {
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
 
@@ -101,12 +114,14 @@ public class GestorSeguridad {
     /**
      * Descifra un conjunto de datos, con la clave y vector de inicialización dados
      *
-     * @param datos - array de bytes con los datos a encriptar
-     * @param claveDerivada - clave de cifrado derivada mediante contraseña maestra
-     * @param vectorInicializacion - Vector de inicialización
+     * @param datos                array de bytes con los datos a encriptar
+     * @param claveDerivada        clave de cifrado derivada mediante contraseña maestra
+     * @param vectorInicializacion vector de inicialización
      * @return datos descifrados
-     * */
-    public byte[] descifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception{
+     * @throws Exception si la operación de descifrado falla
+     *
+     */
+    public byte[] descifrar(byte[] datos, byte[] claveDerivada, byte[] vectorInicializacion) throws Exception {
 
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
 

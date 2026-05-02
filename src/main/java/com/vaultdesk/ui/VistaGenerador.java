@@ -10,15 +10,19 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
+/**
+ * Vista para la pestaña 'Generador'
+ *
+ */
 public class VistaGenerador {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public VistaGenerador(ControladorPrincipal controladorPrincipal){
+    public VistaGenerador(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public BorderPane crearContenido(){
+    public BorderPane crearContenido() {
 
         BorderPane root = new BorderPane();
 
@@ -46,8 +50,8 @@ public class VistaGenerador {
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red;");
 
-        botonGenerar.setOnAction(e ->{
-            try{
+        botonGenerar.setOnAction(e -> {
+            try {
                 int longitud = parse(campoLogintud.getText());
                 int mayusculas = parse(campoMayusculas.getText());
                 int minusculas = parse(campoMinusculas.getText());
@@ -59,13 +63,13 @@ public class VistaGenerador {
                 campoResultado.setText(password);
                 etiquetaError.setText("");
 
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 etiquetaError.setText("Error: " + ex.getMessage());
             }
         });
 
-        botonCopiar.setOnAction(e->{
-            if(!campoResultado.getText().isEmpty()){
+        botonCopiar.setOnAction(e -> {
+            if (!campoResultado.getText().isEmpty()) {
                 ClipboardContent contenido = new ClipboardContent();
                 contenido.putString(campoResultado.getText());
                 Clipboard.getSystemClipboard().setContent(contenido);
@@ -74,13 +78,13 @@ public class VistaGenerador {
 
         int fila = 0;
 
-        parrilla.add(new Label("Longitud mínima"),0, fila);
+        parrilla.add(new Label("Longitud mínima"), 0, fila);
         parrilla.add(campoLogintud, 1, fila++);
 
         parrilla.add(new Label("Mínimo de mayúsculas"), 0, fila);
         parrilla.add(campoMayusculas, 1, fila++);
 
-        parrilla.add(new Label("Mínimo de minúsculas"), 0 , fila);
+        parrilla.add(new Label("Mínimo de minúsculas"), 0, fila);
         parrilla.add(campoMinusculas, 1, fila++);
 
         parrilla.add(new Label("Mínimo de dígitos"), 0, fila);
@@ -100,9 +104,9 @@ public class VistaGenerador {
         return root;
     }
 
-    public int parse(String campo){
+    public int parse(String campo) {
 
-        if(campo == null || campo.isBlank()){
+        if (campo == null || campo.isBlank()) {
             return 0;
         }
         return Integer.parseInt(campo);

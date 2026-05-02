@@ -12,11 +12,16 @@ public class DialogoNuevaBoveda {
 
     private final Stage owner;
 
-    public DialogoNuevaBoveda(Stage owner){
+    public DialogoNuevaBoveda(Stage owner) {
         this.owner = owner;
     }
 
-    public void mostrar(Consumer<DatosNuevaBoveda> callback){
+    /**
+     * Muestra el diálogo de creación de una nueva Bóveda
+     *
+     *
+     */
+    public void mostrar(Consumer<DatosNuevaBoveda> callback) {
 
         Dialog<DatosNuevaBoveda> dialogo = new Dialog<>();
         dialogo.initOwner(owner);
@@ -50,18 +55,18 @@ public class DialogoNuevaBoveda {
 
         dialogo.setResultConverter(
                 botonPulsado -> {
-                    if(botonPulsado == botonAceptar){
+                    if (botonPulsado == botonAceptar) {
                         String nombre = campoNombre.getText();
                         String password = campoPassword.getText();
                         String confirmar = confirmarPassword.getText();
 
-                        if(nombre == null || nombre.isBlank()){
+                        if (nombre == null || nombre.isBlank()) {
                             return null;
                         }
-                        if(password == null || password.isEmpty()){
+                        if (password == null || password.isEmpty()) {
                             return null;
                         }
-                        if(!password.equals(confirmar)){
+                        if (!password.equals(confirmar)) {
                             return null;
                         }
 
@@ -80,6 +85,7 @@ public class DialogoNuevaBoveda {
 
     }
 
-    public record DatosNuevaBoveda(String nombre, char[] password) {}
+    public record DatosNuevaBoveda(String nombre, char[] password) {
+    }
 
 }

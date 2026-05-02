@@ -4,7 +4,8 @@ import java.time.LocalDate;
 
 /**
  * Representa cada una de las credenciales de un usuario
- * */
+ *
+ */
 
 public class Credencial {
 
@@ -27,7 +28,7 @@ public class Credencial {
     private Categoria categoria;
 
     // Constructor vacío
-    public Credencial(){
+    public Credencial() {
     }
 
     // Constructor estándar
@@ -48,7 +49,7 @@ public class Credencial {
             int reqDigitos,
             int reqEspeciales,
             Categoria categoria
-    ){
+    ) {
         this.idCredencial = idCredencial;
         this.urlIdentificador = urlIdentificador;
         this.username = username;
@@ -67,115 +68,115 @@ public class Credencial {
         this.categoria = categoria;
     }
 
-    public void setIdCredencial(int idCredencial){
+    public void setIdCredencial(int idCredencial) {
         this.idCredencial = idCredencial;
     }
 
-    public void setUrlIdentificador(String urlIdentificador){
+    public void setUrlIdentificador(String urlIdentificador) {
         this.urlIdentificador = urlIdentificador;
     }
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setPassword(String password){
-        this.password =password;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setDestacada(boolean destacada){
+    public void setDestacada(boolean destacada) {
         this.destacada = destacada;
     }
 
-    public void setAnotaciones(String anotaciones){
+    public void setAnotaciones(String anotaciones) {
         this.anotaciones = anotaciones;
     }
 
-    public void setCaduca(boolean caduca){
+    public void setCaduca(boolean caduca) {
         this.caduca = caduca;
     }
 
-    public void setFechaCaducidad(LocalDate fechaCaducidad){
+    public void setFechaCaducidad(LocalDate fechaCaducidad) {
         this.fechaCaducidad = fechaCaducidad;
     }
 
-    public void setPeriodoCaducidad(int periodoCaducidad){
+    public void setPeriodoCaducidad(int periodoCaducidad) {
         this.periodoCaducidad = periodoCaducidad;
     }
 
-    public void setFechaUltimoUpdate(LocalDate fechaUltimoUpdate){
+    public void setFechaUltimoUpdate(LocalDate fechaUltimoUpdate) {
         this.fechaUltimoUpdate = fechaUltimoUpdate;
     }
 
-    public void setReqLongitud(int reqLongitud){
+    public void setReqLongitud(int reqLongitud) {
         this.reqLongitud = reqLongitud;
     }
 
-    public void setReqMayusculas(int reqMayusculas){
+    public void setReqMayusculas(int reqMayusculas) {
         this.reqMayusculas = reqMayusculas;
     }
 
-    public void setReqMinusculas(int reqMinusculas){
+    public void setReqMinusculas(int reqMinusculas) {
         this.reqMinusculas = reqMinusculas;
     }
 
-    public void setReqDigitos(int reqDigitos){
+    public void setReqDigitos(int reqDigitos) {
         this.reqDigitos = reqDigitos;
     }
 
-    public void setReqEspeciales(int reqEspeciales){
+    public void setReqEspeciales(int reqEspeciales) {
         this.reqEspeciales = reqEspeciales;
     }
 
-    public void setCategoria(Categoria categoria){
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
-    public int getIdCredencial(){
+    public int getIdCredencial() {
         return this.idCredencial;
     }
 
-    public String getUrlIdentificador(){
+    public String getUrlIdentificador() {
         return this.urlIdentificador;
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return this.username;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return this.password;
     }
 
-    public boolean isDestacada(){
+    public boolean isDestacada() {
         return this.destacada;
     }
 
-    public LocalDate getFechaCaducidad(){
+    public LocalDate getFechaCaducidad() {
         return this.fechaCaducidad;
     }
 
-    public LocalDate getFechaUltimoUpdate(){
+    public LocalDate getFechaUltimoUpdate() {
         return this.fechaUltimoUpdate;
     }
 
-    public int getPeriodoCaducidad(){
+    public int getPeriodoCaducidad() {
         return this.periodoCaducidad;
     }
 
-    public int getReqLongitud(){
+    public int getReqLongitud() {
         return this.reqLongitud;
     }
 
-    public int getReqMayusculas(){
+    public int getReqMayusculas() {
         return this.reqMayusculas;
     }
 
-    public int getReqMinusculas(){
+    public int getReqMinusculas() {
         return this.reqMinusculas;
     }
 
-    public int getReqDigitos(){
+    public int getReqDigitos() {
         return this.reqDigitos;
     }
 
@@ -183,21 +184,21 @@ public class Credencial {
         return this.reqEspeciales;
     }
 
-    public String getAnotaciones(){
+    public String getAnotaciones() {
         return this.anotaciones;
     }
 
-    public boolean isCaduca(){
+    public boolean isCaduca() {
         return this.caduca;
     }
 
-    public Categoria getCategoria(){
+    public Categoria getCategoria() {
         return this.categoria;
     }
 
 
     @Override
-    public String toString(){
+    public String toString() {
         return this.username;
     }
 

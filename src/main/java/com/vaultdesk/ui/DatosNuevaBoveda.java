@@ -1,3 +1,4 @@
 package com.vaultdesk.ui;
 
-public record DatosNuevaBoveda(String nombre, char[] passwordMaestra){}
+public record DatosNuevaBoveda(String nombre, char[] passwordMaestra) {
+}

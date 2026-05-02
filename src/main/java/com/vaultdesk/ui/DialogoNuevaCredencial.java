@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -18,11 +17,16 @@ public class DialogoNuevaCredencial {
 
     private final Stage owner;
 
-    public DialogoNuevaCredencial(Stage owner){
+    public DialogoNuevaCredencial(Stage owner) {
         this.owner = owner;
     }
 
-    public void mostrar(List<Categoria> listaCategorias, Consumer<DatosNuevaCredencial> callback){
+    /**
+     * Muestra el diálogo de creación de una nueva credencial
+     *
+     *
+     */
+    public void mostrar(List<Categoria> listaCategorias, Consumer<DatosNuevaCredencial> callback) {
 
         Stage dialogo = new Stage();
 
@@ -37,7 +41,6 @@ public class DialogoNuevaCredencial {
         TextField campoAnotaciones = new TextField();
 
         CheckBox checkBoxCaduca = new CheckBox("Caduca");
-        //TextField campoFechaCaducidad = new TextField();
 
         DatePicker campoFechaCaducidad = new DatePicker();
 
@@ -70,9 +73,9 @@ public class DialogoNuevaCredencial {
                 .findFirst()
                 .orElse(null);
 
-        if(categoriaOtros != null){
+        if (categoriaOtros != null) {
             comboBoxCategoria.getSelectionModel().selectFirst();
-        } else if(!listaCategorias.isEmpty()){
+        } else if (!listaCategorias.isEmpty()) {
             comboBoxCategoria.getSelectionModel().selectFirst();
         }
 
@@ -81,9 +84,9 @@ public class DialogoNuevaCredencial {
         etiquetaError.setStyle("-fx-text-fill: red;");
 
         Button botonAceptar = new Button("Aceptar");
-        Button botonCancerlar  = new Button("Cancelar");
+        Button botonCancerlar = new Button("Cancelar");
 
-        botonAceptar.setOnAction(e->{
+        botonAceptar.setOnAction(e -> {
 
             try {
 
@@ -116,7 +119,6 @@ public class DialogoNuevaCredencial {
                         checkBoxDestacada.isSelected(),
                         campoAnotaciones.getText(),
                         checkBoxCaduca.isSelected(),
-                        //campoFechaCaducidad.getValue().toString(),
                         fechaCaducidad,
                         parseEntero(campoPeriodoCaducidad.getText()),
                         parseEntero(campoReqLongitud.getText()),
@@ -127,12 +129,12 @@ public class DialogoNuevaCredencial {
                         categoriaSeleccionada.getIdCategoria()
                 )); // Por defecto se adjudica a la categoría 'Otros'
                 dialogo.close();
-            } catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 etiquetaError.setText("Los campos deben contener números enteros válidos");
             }
         });
 
-        botonCancerlar.setOnAction(e->{
+        botonCancerlar.setOnAction(e -> {
             callback.accept(null);
             dialogo.close();
         });
@@ -176,7 +178,7 @@ public class DialogoNuevaCredencial {
         parrilla.add(campoReqLongitud, 1, fila++);
 
         parrilla.add(new Label("Requisito mayúsculas"), 0, fila);
-        parrilla.add(campoReqMayusculas, 1 ,fila++);
+        parrilla.add(campoReqMayusculas, 1, fila++);
 
         parrilla.add(new Label("Requisito minúsculas"), 0, fila);
         parrilla.add(campoReqMinusculas, 1, fila++);
@@ -188,7 +190,7 @@ public class DialogoNuevaCredencial {
         parrilla.add(campoReqEspeciales, 1, fila++);
 
         parrilla.add(etiquetaError, 0, fila, 2, 1);
-        parrilla.add(botonAceptar, 0,fila);
+        parrilla.add(botonAceptar, 0, fila);
         parrilla.add(botonCancerlar, 1, fila);
 
         dialogo.setScene(new Scene(parrilla, 400, 600));
@@ -196,9 +198,9 @@ public class DialogoNuevaCredencial {
     }
 
 
-    private int parseEntero(String  texto){
+    private int parseEntero(String texto) {
 
-        if(texto == null || texto.isBlank()){
+        if (texto == null || texto.isBlank()) {
             return 0;
         }
         return Integer.parseInt(texto.trim());
@@ -220,6 +222,7 @@ public class DialogoNuevaCredencial {
             int reqDigitos,
             int reqEspeciales,
             int idCategoria
-    ){}
+    ) {
+    }
 
 }

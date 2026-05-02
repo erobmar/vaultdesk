@@ -15,21 +15,21 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Objects;
 
+/**
+ * Vista inicial del sistema, sin bóveda cargada
+ *
+ */
 public class VistaInicial {
 
     private final ControladorPrincipal controladorPrincipal;
 
-    public VistaInicial(ControladorPrincipal controladorPrincipal){
+    public VistaInicial(ControladorPrincipal controladorPrincipal) {
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public Scene crearEscena(){
+    public Scene crearEscena() {
 
         BorderPane root = new BorderPane();
 
@@ -45,13 +45,12 @@ public class VistaInicial {
         MenuItem itemSalir = new MenuItem("Salir");
         itemSalir.setOnAction(e -> controladorPrincipal.salirAplicacion());
 
-        menuArchivo.getItems().addAll(itemAbrirBoveda,itemNuevaBoveda, itemSalir);
+        menuArchivo.getItems().addAll(itemAbrirBoveda, itemNuevaBoveda, itemSalir);
 
         menu.getMenus().add(menuArchivo);
 
-        Image imagen = new Image(getClass().getResourceAsStream("/VaultDeskLogoFullSize.png"));
+        Image imagen = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/VaultDeskLogoFullSize.png")));
         ImageView logo = new ImageView(imagen);
-
         logo.setPreserveRatio(true);
         logo.setFitHeight(600);
         logo.setFitWidth(400);

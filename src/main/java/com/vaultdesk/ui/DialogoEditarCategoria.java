@@ -11,7 +11,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
 
 import java.util.function.Consumer;
 
@@ -19,11 +18,15 @@ public class DialogoEditarCategoria {
 
     private final Stage owner;
 
-    public DialogoEditarCategoria(Stage owner){
+    public DialogoEditarCategoria(Stage owner) {
         this.owner = owner;
     }
 
-    public void mostrar(Categoria categoria, Consumer<GestorCategorias.DatosEdicionCategoria> callback){
+    /**
+     * Muestra el diálogo de creación de categoría
+     *
+     */
+    public void mostrar(Categoria categoria, Consumer<GestorCategorias.DatosEdicionCategoria> callback) {
 
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
@@ -44,11 +47,11 @@ public class DialogoEditarCategoria {
         Button botonAceptar = new Button("Aceptar");
         Button botonCancelar = new Button("Cancelar");
 
-        botonAceptar.setOnAction(e->{
+        botonAceptar.setOnAction(e -> {
             String nombreCategoria = campoNombre.getText() == null ? "" : campoNombre.getText().trim();
             String descripcionCategoria = campoDescripcion.getText() == null ? "" : campoDescripcion.getText().trim();
 
-            if(nombreCategoria.isEmpty()){
+            if (nombreCategoria.isEmpty()) {
                 etiquetaError.setText("Debes proporcionar un nombre para la categoría");
                 return;
             }
@@ -58,7 +61,7 @@ public class DialogoEditarCategoria {
 
         });
 
-        botonCancelar.setOnAction(e->{
+        botonCancelar.setOnAction(e -> {
             callback.accept(null);
             dialogo.close();
         });
@@ -83,7 +86,7 @@ public class DialogoEditarCategoria {
         parrilla.add(botonAceptar, 0, fila);
         parrilla.add(botonCancelar, 1, fila);
 
-        dialogo.setScene(new Scene(parrilla, 320,240));
+        dialogo.setScene(new Scene(parrilla, 320, 240));
         dialogo.show();
 
     }

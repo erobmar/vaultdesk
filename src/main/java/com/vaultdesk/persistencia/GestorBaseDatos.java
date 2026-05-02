@@ -7,18 +7,102 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Clase encargada de gestionar las operaciones sobre la base de datos relacionadas con la persistencia
+ * <p>
+ * Esta clase actúa como enlace entre el GestorPersistencia y la base de datos, realizando tareas de inicialización de
+ * bases de datos, carga de bases de datos en memoria o serialización de datos para la creación del archivo de bóveda.
+ * </p>
+ *
+ */
 public class GestorBaseDatos {
 
     private static final String URL_SQLITE_EN_MEMORIA = "jdbc:sqlite::memory:";
 
-    public Connection abrirConexionEnMemoria() throws SQLException {
+
+    /**
+     * Centraliza las operaciones de inicialización de la base de datos
+     *
+     * @return conexión con la base de datos ya inicializada
+     * @throws SQLException si la conexión con la base de datos presenta algún problema
+     * @see GestorBaseDatos#abrirConexionEnMemoria()
+     * @see GestorBaseDatos#crearEsquema(Connection)
+     * @see GestorBaseDatos#insertarDatosSemilla(Connection)
+     *
+     *
+     */
+    public Connection crearBaseDatosEnMemoria() throws SQLException {
+
+        Connection conexion = abrirConexionEnMemoria();
+        crearEsquema(conexion);
+        insertarDatosSemilla(conexion);
+        return conexion;
+
+    }
+
+    /**
+     * Serializa la base de datos para prepararla para su cifrado
+     *
+     * @param conexion conexión activa con la base de datos
+     * @return array de bytes con la base de datos serializada
+     * @throws SQLException si la conexión con la base de datos presenta algún problema
+     *
+     *
+     */
+    public byte[] serializarBaseDatos(Connection conexion) throws SQLException {
+
+        if (conexion == null) {
+            throw new IllegalArgumentException("La conexión no puede ser nula");
+        }
+
+        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
+        return conexionSQLite.serialize("main");
+    }
+
+    /**
+     * Carga una base de datos en memoria desde un array de bytes ("de-serializa" una base de datos tras su descifrado)
+     *
+     * @param datoBaseDatos array de bytes con la base de datos serializada a cargar
+     * @throws SQLException si la conexión con la base de datos presenta algún problema
+     *
+     *
+     */
+    public Connection cargarBaseDatosDesdeBytes(byte[] datoBaseDatos) throws SQLException {
+
+        if (datoBaseDatos == null || datoBaseDatos.length == 0) {
+            throw new IllegalArgumentException("La base de datos no puede ser nula");
+        }
+
+        Connection conexion = abrirConexionEnMemoria();
+
+        try (Statement sentencia = conexion.createStatement()) {
+            sentencia.execute("PRAGMA foreign_keys = ON");
+        }
+
+        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
+        conexionSQLite.deserialize("main", datoBaseDatos);
+
+        return conexion;
+    }
+
+    /**
+     * Crea una conexión con la base de datos usando el driver :memory: de SQLite (sin persistencia física)
+     *
+     *
+     */
+    private Connection abrirConexionEnMemoria() throws SQLException {
 
         return DriverManager.getConnection(URL_SQLITE_EN_MEMORIA);
     }
 
-    public void crearEsquema(Connection conexion) throws SQLException{
+    /**
+     * Crea el esquema de tablas en la base de datos
+     *
+     *
+     */
+    private void crearEsquema(Connection conexion) throws SQLException {
 
-        try(Statement sentenciaCreacion = conexion.createStatement()){
+        try (Statement sentenciaCreacion = conexion.createStatement()) {
             sentenciaCreacion.execute("PRAGMA foreign_keys=ON");
 
             sentenciaCreacion.execute("""
@@ -84,9 +168,14 @@ public class GestorBaseDatos {
 
     }
 
-    public void insertarDatosSemilla(Connection conexion) throws SQLException{
+    /**
+     * Inserta en la base de datos los datos iniciales necesarios para su funcionamiento
+     *
+     *
+     */
+    private void insertarDatosSemilla(Connection conexion) throws SQLException {
 
-        try (Statement sentenciaCreacionSemilla = conexion.createStatement()){
+        try (Statement sentenciaCreacionSemilla = conexion.createStatement()) {
             sentenciaCreacionSemilla.execute("""
                     INSERT INTO idioma (id_idioma, nombre)
                     VALUES
@@ -108,43 +197,6 @@ public class GestorBaseDatos {
                     """);
         }
 
-    }
-
-    public Connection crearBaseDatosEnMemoria() throws SQLException{
-
-        Connection conexion = abrirConexionEnMemoria();
-        crearEsquema(conexion);
-        insertarDatosSemilla(conexion);
-        return conexion;
-
-    }
-
-    public byte[] serializarBaseDatos(Connection conexion) throws SQLException{
-
-        if(conexion == null){
-            throw new IllegalArgumentException("La conexión no puede ser nula");
-        }
-
-        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
-        return conexionSQLite.serialize("main");
-    }
-
-    public Connection cargarBaseDatosDesdeBytes(byte[] datoBaseDatos) throws SQLException{
-
-        if(datoBaseDatos == null || datoBaseDatos.length == 0){
-            throw new IllegalArgumentException("La base de datos no puede ser nula");
-        }
-
-        Connection conexion = abrirConexionEnMemoria();
-
-        try (Statement sentencia = conexion.createStatement()){
-            sentencia.execute("PRAGMA foreign_keys = ON");
-        }
-
-        SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
-        conexionSQLite.deserialize("main", datoBaseDatos);
-
-        return conexion;
     }
 
 

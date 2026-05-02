@@ -22,7 +22,7 @@ public class AlertaCaducidad {
         this.estado = estado;
     }
 
-    public Credencial getCredencial(){
+    public Credencial getCredencial() {
         return this.credencial;
     }
 
@@ -30,7 +30,7 @@ public class AlertaCaducidad {
         return this.fechaCaducidad;
     }
 
-    public String getEstado(){
+    public String getEstado() {
         return this.estado;
     }
 }

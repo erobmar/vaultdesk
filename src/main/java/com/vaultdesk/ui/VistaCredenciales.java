@@ -5,7 +5,6 @@ import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -14,12 +13,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.sql.ClientInfoStatus;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Vista para la pestaña 'Credenciales'
+ *
+ */
 public class VistaCredenciales {
 
     private final ControladorPrincipal controladorPrincipal;
@@ -30,12 +30,12 @@ public class VistaCredenciales {
 
     private Integer idCredencialVisible = null;
 
-    public VistaCredenciales(ControladorPrincipal controladorPrincipal){
+    public VistaCredenciales(ControladorPrincipal controladorPrincipal) {
 
         this.controladorPrincipal = controladorPrincipal;
     }
 
-    public BorderPane crearContenido(){
+    public BorderPane crearContenido() {
 
         root = new BorderPane();
 
@@ -58,11 +58,10 @@ public class VistaCredenciales {
         TableColumn<Credencial, String> columnaCategoria = new TableColumn<>("Categoría");
 
 
-
         columnaID.setCellValueFactory(datos ->
-            new ReadOnlyObjectWrapper<>(datos.getValue().getIdCredencial())
+                new ReadOnlyObjectWrapper<>(datos.getValue().getIdCredencial())
         );
-        columnaUsername.setCellValueFactory(datos->
+        columnaUsername.setCellValueFactory(datos ->
                 new ReadOnlyObjectWrapper<>(datos.getValue().getUsername())
         );
         columnaUrlIdentificador.setCellValueFactory(datos ->
@@ -78,7 +77,7 @@ public class VistaCredenciales {
                 )
         );
         columnaDestacada.setCellValueFactory(datos ->
-            new ReadOnlyObjectWrapper<>(datos.getValue().isDestacada() ? "Sí" : "No")
+                new ReadOnlyObjectWrapper<>(datos.getValue().isDestacada() ? "Sí" : "No")
         );
         columnaCaduca.setCellValueFactory(datos ->
                 new ReadOnlyObjectWrapper<>(datos.getValue().isCaduca() ? "Sí" : "No")
@@ -138,11 +137,6 @@ public class VistaCredenciales {
                 columnaCaduca,
                 columnaFechaCaducidad,
                 columnaPeriodoCaducidad,
-                /*columnaReqLongitud,
-                columnaReqMayusculas,
-                columnaReqMinusculas,
-                columnaReqDigitos,
-                columnaReqEspeciales,*/
                 columnaAnotaciones
         );
 
@@ -156,11 +150,6 @@ public class VistaCredenciales {
         columnaCaduca.setPrefWidth(50);
         columnaFechaCaducidad.setPrefWidth(80);
         columnaPeriodoCaducidad.setPrefWidth(50);
-       /* columnaReqLongitud.setPrefWidth(120);
-        columnaReqMayusculas.setPrefWidth(120);
-        columnaReqMinusculas.setPrefWidth(120);
-        columnaReqDigitos.setPrefWidth(120);
-        columnaReqEspeciales.setPrefWidth(120);*/
 
         // Sección para botón de 'Nueva credencial' - "Editar credencial"
         Button botonNuevaCredencial = new Button("Nueva...");
@@ -197,8 +186,7 @@ public class VistaCredenciales {
         Button botonLimpiarBusqueda = new Button("Limpiar búsqueda");
 
 
-
-        botonNuevaCredencial.setOnAction(e->{
+        botonNuevaCredencial.setOnAction(e -> {
 
             DialogoNuevaCredencial dialogo = new DialogoNuevaCredencial((Stage) root.getScene().getWindow()); // TODO - Documentar
 
@@ -212,7 +200,6 @@ public class VistaCredenciales {
                         return;
                     }
                     try {
-
 
 
                         controladorPrincipal.crearCredencial(
@@ -239,17 +226,17 @@ public class VistaCredenciales {
                         excepcion.printStackTrace();
                     }
                 });
-            } catch (Exception es){
+            } catch (Exception es) {
 
                 es.printStackTrace();
 
             }
         });
 
-        botonEditarCredencial.setOnAction(e->{
+        botonEditarCredencial.setOnAction(e -> {
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
 
@@ -259,7 +246,7 @@ public class VistaCredenciales {
 
                 List<Categoria> listaCategorias = controladorPrincipal.obtenerCategorias();
 
-                dialogoEditarCredencial.mostrar(seleccionada, listaCategorias,datos -> {
+                dialogoEditarCredencial.mostrar(seleccionada, listaCategorias, datos -> {
 
                     if (datos == null) {
                         return;
@@ -290,28 +277,28 @@ public class VistaCredenciales {
                         exc.printStackTrace();
                     }
                 });
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
 
 
-        botonEliminarCredencial.setOnAction(e->{
+        botonEliminarCredencial.setOnAction(e -> {
 
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
 
                 return;
             }
 
             boolean confirmado = controladorPrincipal.confirmarEliminacionCredencial();
 
-            if(!confirmado){
+            if (!confirmado) {
                 return;
             }
 
-            try{
+            try {
                 controladorPrincipal.eliminarCredencial(seleccionada);
 
                 botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
@@ -328,37 +315,37 @@ public class VistaCredenciales {
 
         });
 
-        botonBuscar.setOnAction(e->{
-            try{
+        botonBuscar.setOnAction(e -> {
+            try {
                 List<Credencial> listaBusqueda = controladorPrincipal.buscarCredencial(campoBusqueda.getText());
                 tablaCredenciales.setItems(FXCollections.observableArrayList(listaBusqueda));
-            } catch (Exception exce){
+            } catch (Exception exce) {
                 exce.printStackTrace();
             }
         });
 
-        botonLimpiarBusqueda.setOnAction(e->{
-            try{
+        botonLimpiarBusqueda.setOnAction(e -> {
+            try {
                 campoBusqueda.clear();
                 comboBoxFiltroCategorias.getSelectionModel().clearSelection();
                 idCredencialVisible = null;
                 refrescarTabla(tablaCredenciales);
                 botonCopiarPassword.setDisable(true);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
 
-        campoBusqueda.setOnAction(e-> botonBuscar.fire());
+        campoBusqueda.setOnAction(e -> botonBuscar.fire());
 
-        botonTogglePassword.setOnAction(e ->{
+        botonTogglePassword.setOnAction(e -> {
 
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
-            if(idCredencialVisible != null && idCredencialVisible == seleccionada.getIdCredencial()){
+            if (idCredencialVisible != null && idCredencialVisible == seleccionada.getIdCredencial()) {
                 idCredencialVisible = null;
             } else {
                 idCredencialVisible = seleccionada.getIdCredencial();
@@ -366,22 +353,21 @@ public class VistaCredenciales {
 
             botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
 
-            try{
+            try {
                 tablaCredenciales.refresh();
                 botonCopiarPassword.setDisable(!sePuedeCopiar(seleccionada));
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
         });
 
-        botonCopiarPassword.setOnAction(e->{
+        botonCopiarPassword.setOnAction(e -> {
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(!sePuedeCopiar(seleccionada)){
+            if (!sePuedeCopiar(seleccionada)) {
                 return;
             }
-
 
 
             ClipboardContent contenido = new ClipboardContent();
@@ -400,45 +386,45 @@ public class VistaCredenciales {
 
         });
 
-        botonActualizarPassword.setOnAction(e->{
+        botonActualizarPassword.setOnAction(e -> {
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
 
             boolean confirmado = controladorPrincipal.confirmarActualizacionPassword();
 
-            if(!confirmado){
+            if (!confirmado) {
                 return;
             }
-            try{
+            try {
                 controladorPrincipal.actualizarPasswordCredencial(seleccionada);
                 refrescarTabla(tablaCredenciales);
                 tablaCredenciales.refresh();
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
         });
 
-        botonFiltrar.setOnAction(e->{
+        botonFiltrar.setOnAction(e -> {
 
             Categoria seleccionFiltro = comboBoxFiltroCategorias.getValue();
 
-            if(seleccionFiltro == null){
+            if (seleccionFiltro == null) {
                 return;
             }
             try {
                 List<Credencial> credencialesFiltradas = controladorPrincipal.obtenerCredencialesPorCategoria(seleccionFiltro.getIdCategoria());
                 tablaCredenciales.setItems(FXCollections.observableArrayList(credencialesFiltradas));
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
         });
 
-        botonLimpiarFiltro.setOnAction(e->{
+        botonLimpiarFiltro.setOnAction(e -> {
             try {
                 comboBoxFiltroCategorias.getSelectionModel().clearSelection();
                 refrescarTabla(tablaCredenciales);
@@ -447,27 +433,27 @@ public class VistaCredenciales {
             }
         });
 
-        botonToggleDestacada.setOnAction(e->{
+        botonToggleDestacada.setOnAction(e -> {
 
             Credencial seleccionada = tablaCredenciales.getSelectionModel().getSelectedItem();
 
-            if(seleccionada == null){
+            if (seleccionada == null) {
                 return;
             }
-            try{
+            try {
                 controladorPrincipal.toggleDestacada(seleccionada);
                 refrescarTabla(tablaCredenciales);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
         });
 
-        botonSoloDestacadas.setOnAction(e->{
+        botonSoloDestacadas.setOnAction(e -> {
             try {
                 List<Credencial> destacadas = controladorPrincipal.obtenerCredencialesDestacadas();
                 tablaCredenciales.setItems(FXCollections.observableArrayList(destacadas));
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
@@ -501,10 +487,10 @@ public class VistaCredenciales {
         );
 
 
-        try{
+        try {
             List<Credencial> credenciales = controladorPrincipal.obtenerCredenciales();
             tablaCredenciales.setItems(FXCollections.observableArrayList(credenciales));
-        } catch (Exception e){
+        } catch (Exception e) {
             root.setTop(controles);
             root.setCenter(new Label("Error al cargar las credenciales" + e.getMessage()));
             return root;
@@ -516,19 +502,31 @@ public class VistaCredenciales {
         return root;
     }
 
-    private void refrescarTabla(TableView<Credencial> tablaCredenciales) throws Exception{
+    /**
+     * Refresca la tabla para reflejar los últimos cambios
+     *
+     */
+    private void refrescarTabla(TableView<Credencial> tablaCredenciales) throws Exception {
         List<Credencial> credencialesActualizadas = controladorPrincipal.obtenerCredenciales();
         tablaCredenciales.setItems(FXCollections.observableArrayList(credencialesActualizadas));
     }
 
-    private String ocultarPassword(String password){
-        if(password == null || password.isEmpty()){
+    /**
+     * Oculta la contraseña remplazándola por asteriscos
+     *
+     */
+    private String ocultarPassword(String password) {
+        if (password == null || password.isEmpty()) {
             return "";
         }
         return "*".repeat(password.length());
     }
 
-    private boolean sePuedeCopiar(Credencial credencial){
+    /**
+     * Indica si la contraseña está visible para poder ser copiada al portapapeles
+     *
+     */
+    private boolean sePuedeCopiar(Credencial credencial) {
         return credencial != null && idCredencialVisible != null && credencial.getIdCredencial() == idCredencialVisible;
     }
 

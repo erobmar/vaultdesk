@@ -9,10 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.w3c.dom.Text;
 
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -20,11 +17,16 @@ public class DialogoEditarCredencial {
 
     private final Stage owner;
 
-    public DialogoEditarCredencial(Stage owner){
+    public DialogoEditarCredencial(Stage owner) {
         this.owner = owner;
     }
 
-    public void mostrar(Credencial credencial, List<Categoria> listaCategorias, Consumer<DatosEdicionCredencial> callback){
+    /**
+     * Muestra el diálogo de edición de credenciales
+     *
+     *
+     */
+    public void mostrar(Credencial credencial, List<Categoria> listaCategorias, Consumer<DatosEdicionCredencial> callback) {
 
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
@@ -39,7 +41,7 @@ public class DialogoEditarCredencial {
         ComboBox<Categoria> comboBoxCategoria = new ComboBox<>();
         comboBoxCategoria.setItems(FXCollections.observableArrayList(listaCategorias));
 
-        if(credencial.getCategoria() != null){
+        if (credencial.getCategoria() != null) {
             int idCategoriaActual = credencial.getCategoria().getIdCategoria();
 
             listaCategorias.stream()
@@ -47,7 +49,7 @@ public class DialogoEditarCredencial {
                     .findFirst()
                     .ifPresent(c -> comboBoxCategoria.getSelectionModel().select(c));
         }
-        if(comboBoxCategoria.getValue() == null && !listaCategorias.isEmpty()){
+        if (comboBoxCategoria.getValue() == null && !listaCategorias.isEmpty()) {
             comboBoxCategoria.getSelectionModel().selectFirst();
         }
 
@@ -58,8 +60,6 @@ public class DialogoEditarCredencial {
 
         CheckBox checkBoxCaduca = new CheckBox("Caduca");
         checkBoxCaduca.setSelected(credencial.isCaduca());
-
-        //TextField campoFechaCaducidad = new TextField(credencial.getFechaCaducidad() == null ? "" : credencial.getFechaCaducidad().toString());
 
         DatePicker campoFechaCaducidad = new DatePicker(credencial.getFechaCaducidad() == null ? null : credencial.getFechaCaducidad());
 
@@ -84,7 +84,7 @@ public class DialogoEditarCredencial {
         Button botonAceptar = new Button("Aceptar");
         Button botonCancelar = new Button("Cancelar");
 
-        botonAceptar.setOnAction(e-> {
+        botonAceptar.setOnAction(e -> {
 
             try {
 
@@ -107,7 +107,7 @@ public class DialogoEditarCredencial {
                     etiquetaError.setText("Debes indicar una contraseña");
                     return;
                 }
-                if(categoriaSeleccionada == null){
+                if (categoriaSeleccionada == null) {
                     etiquetaError.setText("Debes seleccionar una categoría");
                     return;
                 }
@@ -120,7 +120,6 @@ public class DialogoEditarCredencial {
                         checkBoxDestacada.isSelected(),
                         campoAnotaciones.getText(),
                         checkBoxCaduca.isSelected(),
-                        //campoFechaCaducidad.getText(),
                         fechaCaducidad,
                         parseEntero(campoPeriodoCaducidad.getText()),
                         parseEntero(campoReqLongitud.getText()),
@@ -134,13 +133,13 @@ public class DialogoEditarCredencial {
                 dialogo.close();
                 callback.accept(datosEdicionCredencial);
 
-            }catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 etiquetaError.setText("Los campos numéricos deben contener número enteros válidos");
             }
 
         });
 
-        botonCancelar.setOnAction(e->{
+        botonCancelar.setOnAction(e -> {
             callback.accept(null);
             dialogo.close();
         });
@@ -152,14 +151,14 @@ public class DialogoEditarCredencial {
 
         int fila = 0;
 
-        parrilla.add(new Label("URL/Identificador"), 0 , fila);
+        parrilla.add(new Label("URL/Identificador"), 0, fila);
         parrilla.add(campoUrl, 1, fila++);
 
         parrilla.add(new Label("Username"), 0, fila);
-        parrilla.add(campoUsername, 1,fila++ );
+        parrilla.add(campoUsername, 1, fila++);
 
         parrilla.add(new Label("Password"), 0, fila);
-        parrilla.add(campoPassword, 1,fila++);
+        parrilla.add(campoPassword, 1, fila++);
 
         parrilla.add(new Label("Categoría"), 0, fila);
         parrilla.add(comboBoxCategoria, 1, fila++);
@@ -171,7 +170,7 @@ public class DialogoEditarCredencial {
         parrilla.add(campoAnotaciones, 1, fila++);
 
         parrilla.add(new Label("Caduca"), 0, fila);
-        parrilla.add(checkBoxCaduca, 1 , fila++);
+        parrilla.add(checkBoxCaduca, 1, fila++);
 
         parrilla.add(new Label("Fecha caducidad"), 0, fila);
         parrilla.add(campoFechaCaducidad, 1, fila++);
@@ -194,22 +193,17 @@ public class DialogoEditarCredencial {
         parrilla.add(new Label("Requisito caracteres especiales"), 0, fila);
         parrilla.add(campoReqEspeciales, 1, fila++);
 
-        parrilla.add(etiquetaError, 0,fila++,2,1);
+        parrilla.add(etiquetaError, 0, fila++, 2, 1);
         parrilla.add(botonAceptar, 0, fila);
-        parrilla.add(botonCancelar, 1,fila);
+        parrilla.add(botonCancelar, 1, fila);
 
-        dialogo.setScene(new Scene(parrilla, 400,600));
+        dialogo.setScene(new Scene(parrilla, 400, 600));
         dialogo.show();
 
     }
 
-    private void cargarCategorias(){
-        List<Categoria> listaCategorias = new ArrayList<>();
-
-    }
-
-    private int parseEntero(String texto){
-        if(texto == null || texto.isBlank()){
+    private int parseEntero(String texto) {
+        if (texto == null || texto.isBlank()) {
             return 0;
         }
         return Integer.parseInt(texto);
@@ -231,6 +225,7 @@ public class DialogoEditarCredencial {
             int reqDigitos,
             int reqEspeciales,
             int idCategoria
-    ){ }
+    ) {
+    }
 
 }
