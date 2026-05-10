@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 /**
  * Clase de controlador principal del sistema
  * <p>
@@ -104,13 +106,13 @@ public class ControladorPrincipal {
 
         ButtonType decision = mostrarConfirmacionCierre();
 
-        if (decision.getText().equals("Cancelar")) {
+        if (decision.getText().equals(GestorIdiomas.getText("boton.cancelar"))) { // "Cancelar"
             return false;
         }
-        if (decision.getText().equals("No Guardar")) {
+        if (decision.getText().equals(GestorIdiomas.getText("boton.noguardar"))) { // "No Guardar"
             return true;
         }
-        if (decision.getText().equals("Guardar")) {
+        if (decision.getText().equals(GestorIdiomas.getText("boton.guardar"))) { // "Guardar"
 
             DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
             char[] passwordMaestra = dialogoPassword.mostrarYEsperar();
@@ -119,7 +121,9 @@ public class ControladorPrincipal {
                 try {
                     gestorPersistencia.abrirBovedaEnMemoria(rutaBoveda, passwordMaestra);
                 } catch (Exception e) {
-                    mostrarMensajeError("Contraseña incorrecta", "No se han guardado los cambios");
+                    mostrarMensajeError(
+                            GestorIdiomas.getText("error.password.title"),
+                            GestorIdiomas.getText("error.password.content")); // "Contraseña incorrecta", "No se han guardado los cambios"
                     return false;
                 }
                 return guardarBovedaInterna(passwordMaestra);
@@ -287,6 +291,13 @@ public class ControladorPrincipal {
         } else if (rutaBoveda != null) {
 
             titulo += " - " + rutaBoveda.getFileName();
+        }
+
+        if(bovedaActual.isAccesibilidad())
+        {
+            primaryStage.getScene().getStylesheets().add(getClass().getResource("/css/accesibilidad.css").toExternalForm());
+        } else {
+            primaryStage.getScene().getStylesheets().remove(getClass().getResource("/css/accesibilidad.css").toExternalForm());
         }
 
         primaryStage.setTitle(titulo);

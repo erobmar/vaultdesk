@@ -1,6 +1,7 @@
 package com.vaultdesk.persistencia;
 
 import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
+import com.vaultdesk.negocio.GestorIdiomas;
 import com.vaultdesk.negocio.GestorSeguridad;
 
 import javax.crypto.*;
@@ -45,7 +46,7 @@ public class GestorPersistencia {
             String identificadorTexto = new String(identificador);
 
             if (!identificadorTexto.equals("VLTD")) {
-                throw new IOException("El archivo proporcionado NO es una bóveda válida");
+                throw new IOException(GestorIdiomas.getText("excepcion.archivonoesboveda")); // "El archivo proporcionado NO es una bóveda válida"
             }
 
             // 2 - Leer 1 byte: versión
@@ -53,7 +54,10 @@ public class GestorPersistencia {
 
             // Añadir más versiones en futuras iteraciones
             if (version != 1) {
-                throw new IOException("La versión de bóveda " + version + " no está soportada por esta versión de VaultDesk");
+                throw new IOException(
+                        GestorIdiomas.getText("excepcion.versionboveda.inicio")
+                                + " " + version + " " +
+                                GestorIdiomas.getText("excepcion.versionboveda.fin")); // "La versión de bóveda " - " no está soportada por esta versión de VaultDesk"
             }
 
             // 3 - Leer 16 bytes: salt
@@ -77,7 +81,7 @@ public class GestorPersistencia {
             int longitudBloqueDatos = entrada.readInt();
 
             if (longitudBloqueDatos <= 0) {
-                throw new IOException("La longitud del bloque cifrado no es válida");
+                throw new IOException(GestorIdiomas.getText("excepcion.bloquecifradonovalido")); // "La longitud del bloque cifrado no es válida"
             }
 
             // 8 - Leer bloque de datos cifrado
@@ -95,7 +99,7 @@ public class GestorPersistencia {
                 return datosDescifrados;
             } catch (BadPaddingException e) {
 
-                throw new ExcepcionIntegridadBoveda("La bóveda está corrupta, ha sido modificada o la contraseña es incorrecta", e);
+                throw new ExcepcionIntegridadBoveda(GestorIdiomas.getText("excepcion.integridad"), e); // "La bóveda está corrupta, ha sido modificada o la contraseña es incorrecta"
             } finally {
                 // 12 - Limpiar la clave derivada en memoria
                 Arrays.fill(claveDerivada, (byte) 0);

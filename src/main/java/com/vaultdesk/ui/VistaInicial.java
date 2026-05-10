@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -34,15 +35,15 @@ public class VistaInicial {
         BorderPane root = new BorderPane();
 
         MenuBar menu = new MenuBar();
-        Menu menuArchivo = new Menu("Archivo");
+        Menu menuArchivo = new Menu(GestorIdiomas.getText("menu.archivo")); // Archivo
 
-        MenuItem itemAbrirBoveda = new MenuItem("Abrir Bóveda...");
+        MenuItem itemAbrirBoveda = new MenuItem(GestorIdiomas.getText("menu.abrirboveda")); // Abrir bóveda...
         itemAbrirBoveda.setOnAction(e -> controladorPrincipal.abrirBoveda());
 
-        MenuItem itemNuevaBoveda = new MenuItem("Nueva Bóveda...");
+        MenuItem itemNuevaBoveda = new MenuItem(GestorIdiomas.getText("menu.nuevaboveda")); // Nueva Bóveda...
         itemNuevaBoveda.setOnAction(e -> controladorPrincipal.crearNuevaBoveda());
 
-        MenuItem itemSalir = new MenuItem("Salir");
+        MenuItem itemSalir = new MenuItem(GestorIdiomas.getText("menu.salir")); // "Salir"
         itemSalir.setOnAction(e -> controladorPrincipal.salirAplicacion());
 
         menuArchivo.getItems().addAll(itemAbrirBoveda, itemNuevaBoveda, itemSalir);
@@ -55,7 +56,7 @@ public class VistaInicial {
         logo.setFitHeight(600);
         logo.setFitWidth(400);
 
-        Label subtitulo = new Label("Gestor de credenciales local y seguro");
+        Label subtitulo = new Label(GestorIdiomas.getText("label.bienvenida")); // Gestor de credenciales local y seguro
         subtitulo.setFont(Font.font(24));
 
         VBox cajaVertical = new VBox(15, logo, subtitulo);

@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
@@ -31,12 +32,12 @@ public class VistaAlertas {
 
         TableView<AlertaCaducidad> tablaAlertas = new TableView<>();
 
-        TableColumn<AlertaCaducidad, String> columnaEstado = new TableColumn<>("Estado");
-        TableColumn<AlertaCaducidad, String> columnaCategoria = new TableColumn<>("Categoría");
-        TableColumn<AlertaCaducidad, String> columnaUrlIdentificador = new TableColumn<>("URL/Identificador");
-        TableColumn<AlertaCaducidad, String> columnaUsername = new TableColumn<>("Username");
-        TableColumn<AlertaCaducidad, String> columnaFechaCaducidad = new TableColumn<>("Fecha caducidad");
-        TableColumn<AlertaCaducidad, String> columnaDiasRestantes = new TableColumn<>("Días restantes");
+        TableColumn<AlertaCaducidad, String> columnaEstado = new TableColumn<>(GestorIdiomas.getText("tablecolumn.estado")); // "Estado"
+        TableColumn<AlertaCaducidad, String> columnaCategoria = new TableColumn<>(GestorIdiomas.getText("tablecolumn.categoria")); // "Categoría"
+        TableColumn<AlertaCaducidad, String> columnaUrlIdentificador = new TableColumn<>(GestorIdiomas.getText("tablecolumn.url")); // "URL/Identificador"
+        TableColumn<AlertaCaducidad, String> columnaUsername = new TableColumn<>(GestorIdiomas.getText("tablecolumn.username")); // "Username"
+        TableColumn<AlertaCaducidad, String> columnaFechaCaducidad = new TableColumn<>(GestorIdiomas.getText("tablecolumn.fechacaducidad")); // "Fecha caducidad"
+        TableColumn<AlertaCaducidad, String> columnaDiasRestantes = new TableColumn<>(GestorIdiomas.getText("tablecolumn.restante")); // "Días restantes"
 
         columnaEstado.setCellValueFactory(datos ->
                 new ReadOnlyObjectWrapper<>(datos.getValue().getEstado())
@@ -86,7 +87,7 @@ public class VistaAlertas {
             List<AlertaCaducidad> listaAlertas = controladorPrincipal.obtenerAlertasCaducidad();
 
             if (listaAlertas.isEmpty()) {
-                root.setCenter(new Label("No hay credenciales caducadas ni próximas a caducar"));
+                root.setCenter(new Label(GestorIdiomas.getText("label.sincredenciales"))); // "No hay credenciales caducadas ni próximas a caducar"
                 return root;
             }
 
@@ -96,7 +97,7 @@ public class VistaAlertas {
 
         } catch (Exception e) {
 
-            root.setCenter(new Label("Se produjo un error al cargar las alertas" + e.getMessage()));
+            root.setCenter(new Label(GestorIdiomas.getText("label.erroralertas") + e.getMessage())); // "Se produjo un error al cargar las alertas"
 
         }
 
@@ -111,13 +112,13 @@ public class VistaAlertas {
 
         if (dias < 0) {
 
-            return "Hace " + Math.abs(dias) + " días";
+            return GestorIdiomas.getText("texto.alertacaducada.inicio") + " " + Math.abs(dias) + " " +  GestorIdiomas.getText("texto.alertacaducada.fin"); // "Hace " + " " + Math.abs(dias) + " " +  " días"
         }
         if (dias == 0) {
-            return "Hoy";
+            return GestorIdiomas.getText("texto.hoy"); // "Hoy"
         }
 
-        return "En " + Math.abs(dias) + " días";
+        return GestorIdiomas.getText("texto.alertaproxima.inicio") + " " + Math.abs(dias) + " " + GestorIdiomas.getText("texto.alertaproxima.fin"); // "En " + Math.abs(dias) + " días"
     }
 
 

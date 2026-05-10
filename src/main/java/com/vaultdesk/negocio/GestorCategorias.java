@@ -96,7 +96,7 @@ public class GestorCategorias {
             int filas = sentencia.executeUpdate();
 
             if (filas == 0) {
-                throw new SQLException("No se puede actualizar la categoria");
+                throw new SQLException(GestorIdiomas.getText("excepcion.actualizarcategoria")); // "No se puede actualizar la categoria"
             }
         }
 
@@ -132,7 +132,7 @@ public class GestorCategorias {
             int filasEliminadas = sentencia.executeUpdate();
 
             if (filasEliminadas == 0) {
-                throw new SQLException("Se produjo un error al eliminar la categoría");
+                throw new SQLException(GestorIdiomas.getText("excepcion.eliminarcategoria")); // "Se produjo un error al eliminar la categoría"
             }
         }
 
@@ -233,7 +233,7 @@ public class GestorCategorias {
             if (resultado.next()) {
                 return resultado.getInt(1);
             }
-            throw new SQLException("No se puede calcular el siguiente idCategoria");
+            throw new SQLException(GestorIdiomas.getText("excepcion.siguienteid")); // "No se puede calcular el siguiente idCategoria"
         }
 
 

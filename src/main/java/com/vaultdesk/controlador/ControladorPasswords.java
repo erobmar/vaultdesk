@@ -1,6 +1,7 @@
 package com.vaultdesk.controlador;
 
 import com.vaultdesk.dominio.Credencial;
+import com.vaultdesk.negocio.GestorIdiomas;
 import com.vaultdesk.negocio.GestorPasswords;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -60,7 +61,7 @@ public class ControladorPasswords {
     public void actualizarPasswordCredencial(Credencial credencial) throws Exception {
 
         if (credencial == null) {
-            throw new IllegalArgumentException("Se debe especificar una credencial");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.sincredencial")); // "Se debe especificar una credencial"
         }
 
         String nuevaPassword = generarPassword(
@@ -105,9 +106,9 @@ public class ControladorPasswords {
     public boolean confirmarActualizacionPassword() {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("Actualizar contraseña");
-        alerta.setHeaderText("Se generará una nueva contraseña para la credencial seleccionada");
-        alerta.setContentText("La contraseña actual será sustituida ¿Deseas continuar?");
+        alerta.setTitle(GestorIdiomas.getText("alerta.actualizarpassword.title")); // "Actualizar contraseña"
+        alerta.setHeaderText(GestorIdiomas.getText("alerta.actualizarpassword.header")); // "Se generará una nueva contraseña para la credencial seleccionada"
+        alerta.setContentText(GestorIdiomas.getText("alerta.actualizarpassword.content")); // "La contraseña actual será sustituida ¿Deseas continuar?"
 
         Optional<ButtonType> eleccion = alerta.showAndWait();
 

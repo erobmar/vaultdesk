@@ -2,6 +2,7 @@ package com.vaultdesk.ui;
 
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -31,7 +32,7 @@ public class DialogoEditarCredencial {
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
         dialogo.initModality(Modality.APPLICATION_MODAL);
-        dialogo.setTitle("Editar credencial");
+        dialogo.setTitle(GestorIdiomas.getText("dialogo.editarcredencial.title")); // "Editar credencial"
 
         TextField campoUrl = new TextField(credencial.getUrlIdentificador());
         TextField campoUsername = new TextField(credencial.getUsername());
@@ -53,12 +54,12 @@ public class DialogoEditarCredencial {
             comboBoxCategoria.getSelectionModel().selectFirst();
         }
 
-        CheckBox checkBoxDestacada = new CheckBox("Destacada");
+        CheckBox checkBoxDestacada = new CheckBox(GestorIdiomas.getText("check.destacada")); // "Destacada"
         checkBoxDestacada.setSelected(credencial.isDestacada());
 
         TextField campoAnotaciones = new TextField(credencial.getAnotaciones() == null ? "" : credencial.getAnotaciones());
 
-        CheckBox checkBoxCaduca = new CheckBox("Caduca");
+        CheckBox checkBoxCaduca = new CheckBox(GestorIdiomas.getText("check.caduca")); // "Caduca"
         checkBoxCaduca.setSelected(credencial.isCaduca());
 
         DatePicker campoFechaCaducidad = new DatePicker(credencial.getFechaCaducidad() == null ? null : credencial.getFechaCaducidad());
@@ -70,19 +71,19 @@ public class DialogoEditarCredencial {
         TextField campoReqDigitos = new TextField(credencial.getReqDigitos() <= 0 ? "" : String.valueOf(credencial.getReqDigitos()));
         TextField campoReqEspeciales = new TextField(credencial.getReqEspeciales() <= 0 ? "" : String.valueOf(credencial.getReqEspeciales()));
 
-        campoPeriodoCaducidad.setPromptText("Días");
-        campoReqLongitud.setPromptText("Longitud mínima");
-        campoReqMayusculas.setPromptText("Mayúsculas");
-        campoReqMinusculas.setPromptText("Minúsculas");
-        campoReqDigitos.setPromptText("Dígitos");
-        campoReqEspeciales.setPromptText("Caracteres especiales");
+        campoPeriodoCaducidad.setPromptText(GestorIdiomas.getText("prompt.caducidad")); // "Días"
+        campoReqLongitud.setPromptText(GestorIdiomas.getText("prompt.longitud")); // "Longitud mínima"
+        campoReqMayusculas.setPromptText(GestorIdiomas.getText("prompt.mayusculas")); // "Mayúsculas"
+        campoReqMinusculas.setPromptText(GestorIdiomas.getText("prompt.minusculas")); // "Minúsculas"
+        campoReqDigitos.setPromptText(GestorIdiomas.getText("prompt.digitos")); // "Dígitos"
+        campoReqEspeciales.setPromptText(GestorIdiomas.getText("prompt.especiales")); // "Caracteres especiales"
 
 
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red");
 
-        Button botonAceptar = new Button("Aceptar");
-        Button botonCancelar = new Button("Cancelar");
+        Button botonAceptar = new Button(GestorIdiomas.getText("boton.aceptar")); // "Aceptar"
+        Button botonCancelar = new Button(GestorIdiomas.getText("boton.cancelar")); // "Cancelar"
 
         botonAceptar.setOnAction(e -> {
 
@@ -96,19 +97,19 @@ public class DialogoEditarCredencial {
                 String fechaCaducidad = campoFechaCaducidad.getValue() == null ? null : campoFechaCaducidad.getValue().toString();
 
                 if (url.isEmpty()) {
-                    etiquetaError.setText("Debes especificar una URL o Identificador de sistema");
+                    etiquetaError.setText(GestorIdiomas.getText("label.errorurl")); // "Debes especificar una URL o Identificador de sistema"
                     return;
                 }
                 if (username.isEmpty()) {
-                    etiquetaError.setText("Debes especificar un nombre de usuario");
+                    etiquetaError.setText(GestorIdiomas.getText("label.errornombre")); // "Debes especificar un nombre de usuario"
                     return;
                 }
                 if (password == null || password.isEmpty()) {
-                    etiquetaError.setText("Debes indicar una contraseña");
+                    etiquetaError.setText(GestorIdiomas.getText("label.errorpassword")); // "Debes indicar una contraseña"
                     return;
                 }
                 if (categoriaSeleccionada == null) {
-                    etiquetaError.setText("Debes seleccionar una categoría");
+                    etiquetaError.setText(GestorIdiomas.getText("label.errorcategoria")); // "Debes seleccionar una categoría"
                     return;
                 }
 
@@ -134,7 +135,7 @@ public class DialogoEditarCredencial {
                 callback.accept(datosEdicionCredencial);
 
             } catch (NumberFormatException ex) {
-                etiquetaError.setText("Los campos numéricos deben contener número enteros válidos");
+                etiquetaError.setText(GestorIdiomas.getText("label.errorvalidacionnumerica")); // "Los campos numéricos deben contener número enteros válidos"
             }
 
         });
@@ -151,46 +152,46 @@ public class DialogoEditarCredencial {
 
         int fila = 0;
 
-        parrilla.add(new Label("URL/Identificador"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.url")), 0, fila); // "URL/Identificador"
         parrilla.add(campoUrl, 1, fila++);
 
-        parrilla.add(new Label("Username"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.username")), 0, fila); // "Username"
         parrilla.add(campoUsername, 1, fila++);
 
-        parrilla.add(new Label("Password"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.password")), 0, fila); // "Password"
         parrilla.add(campoPassword, 1, fila++);
 
-        parrilla.add(new Label("Categoría"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.categoria")), 0, fila); // "Categoría"
         parrilla.add(comboBoxCategoria, 1, fila++);
 
-        parrilla.add(new Label("Destacada"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.destacada")), 0, fila); // "Destacada"
         parrilla.add(checkBoxDestacada, 1, fila++);
 
-        parrilla.add(new Label("Anotaciones"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.anotaciones")), 0, fila); // "Anotaciones"
         parrilla.add(campoAnotaciones, 1, fila++);
 
-        parrilla.add(new Label("Caduca"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.caduca")), 0, fila); // "Caduca"
         parrilla.add(checkBoxCaduca, 1, fila++);
 
-        parrilla.add(new Label("Fecha caducidad"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.fechacaducidad")), 0, fila); // "Fecha caducidad"
         parrilla.add(campoFechaCaducidad, 1, fila++);
 
-        parrilla.add(new Label("Periodo caducidad"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.periodocaducidad")), 0, fila); // "Periodo caducidad"
         parrilla.add(campoPeriodoCaducidad, 1, fila++);
 
-        parrilla.add(new Label("Requisito longitud"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.longitud")), 0, fila); // "Requisito longitud"
         parrilla.add(campoReqLongitud, 1, fila++);
 
-        parrilla.add(new Label("Requisito mayúsculas"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.mayusculas")), 0, fila); // "Requisito mayúsculas"
         parrilla.add(campoReqMayusculas, 1, fila++);
 
-        parrilla.add(new Label("Requisito minúsculas"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.minusculas")), 0, fila); // "Requisito minúsculas"
         parrilla.add(campoReqMinusculas, 1, fila++);
 
-        parrilla.add(new Label("Requisito dígitos"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.digitos")), 0, fila); // "Requisito dígitos"
         parrilla.add(campoReqDigitos, 1, fila++);
 
-        parrilla.add(new Label("Requisito caracteres especiales"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.especiales")), 0, fila); // "Requisito caracteres especiales"
         parrilla.add(campoReqEspeciales, 1, fila++);
 
         parrilla.add(etiquetaError, 0, fila++, 2, 1);

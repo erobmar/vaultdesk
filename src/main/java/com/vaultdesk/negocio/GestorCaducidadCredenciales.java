@@ -70,12 +70,12 @@ public class GestorCaducidadCredenciales {
 
             if (fechaCaducidad.isBefore(fechaHoy) || fechaCaducidad.isEqual(fechaHoy)) {
 
-                alerta.setEstado("Caducada");
+                alerta.setEstado(GestorIdiomas.getText("alerta.caducidad.caducada")); // "Caducada"
                 listaAlertas.add(alerta);
 
             } else if (!fechaCaducidad.isAfter(fechaHoy.plusDays(umbralDias))) {
 
-                alerta.setEstado("Próxima a caducar");
+                alerta.setEstado(GestorIdiomas.getText("alerta.caducidad.proxima")); // "Próxima a caducar"
                 listaAlertas.add(alerta);
 
             }
@@ -96,7 +96,7 @@ public class GestorCaducidadCredenciales {
     private LocalDate calcularFechaCaducidadReal(Credencial credencial) {
 
         if (credencial == null) {
-            throw new IllegalArgumentException("La credencial no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.credencialnula")); // "La credencial no puede ser nula"
         }
 
         if (!credencial.isCaduca()) {

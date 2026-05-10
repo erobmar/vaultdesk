@@ -57,7 +57,7 @@ public class GestorRutasAplicacion {
         try {
             Files.createDirectories(directorioTrabajo);
         } catch (IOException e) {
-            throw new RuntimeException("No se puede crear el directorio de trabajo de la aplicación", e);
+            throw new RuntimeException(GestorIdiomas.getText("excepcion.creardirectorio"), e); // "No se puede crear el directorio de trabajo de la aplicación"
         }
 
 
@@ -78,7 +78,7 @@ public class GestorRutasAplicacion {
         try {
             Files.createDirectories(directorioBovedas);
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo crear el directorio de bóvedas", e);
+            throw new RuntimeException(GestorIdiomas.getText("excepcion.directoriobovedas"), e); // "No se pudo crear el directorio de bóvedas"
         }
 
         return directorioBovedas;

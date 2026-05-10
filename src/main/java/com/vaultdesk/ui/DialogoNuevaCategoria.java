@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.negocio.GestorCategorias;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -33,18 +34,18 @@ public class DialogoNuevaCategoria {
         Stage dialogo = new Stage();
         dialogo.initOwner(owner);
         dialogo.initModality(Modality.APPLICATION_MODAL);
-        dialogo.setTitle("Nueva categoría");
+        dialogo.setTitle(GestorIdiomas.getText("dialogo.nuevacategoria.title")); // "Nueva categoría"
 
-        TextField campoNombre = new TextField("Nombre");
-        TextArea campoDescripcion = new TextArea("Descripción");
+        TextField campoNombre = new TextField(GestorIdiomas.getText("texto.nombre")); // "Nombre"
+        TextArea campoDescripcion = new TextArea(GestorIdiomas.getText("texto.descripcion")); // "Descripción"
 
         campoDescripcion.setPrefRowCount(4);
 
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red;");
 
-        Button botonAceptar = new Button("Aceptar");
-        Button botonCancelar = new Button("Cancelar");
+        Button botonAceptar = new Button(GestorIdiomas.getText("boton.aceptar")); // "Aceptar"
+        Button botonCancelar = new Button(GestorIdiomas.getText("boton.cancelar")); // "Cancelar"
 
         botonAceptar.setOnAction(e -> {
 
@@ -52,7 +53,7 @@ public class DialogoNuevaCategoria {
             String descripcionCategoria = campoDescripcion.getText() == null ? "" : campoDescripcion.getText().trim();
 
             if (nombreCategoria.isEmpty()) {
-                etiquetaError.setText("Debes indicar un nombre para la categoría");
+                etiquetaError.setText(GestorIdiomas.getText("label.error.sinnombre")); // "Debes indicar un nombre para la categoría"
                 return;
             }
 
@@ -78,10 +79,10 @@ public class DialogoNuevaCategoria {
 
         int fila = 0;
 
-        parrilla.add(new Label("Nombre"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.nombre")), 0, fila); // "Nombre"
         parrilla.add(campoNombre, 1, fila++);
 
-        parrilla.add(new Label("Descripción"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.descripcion")), 0, fila); // "Descripción"
         parrilla.add(campoDescripcion, 1, fila++);
 
         parrilla.add(etiquetaError, 0, fila, 2, 1);

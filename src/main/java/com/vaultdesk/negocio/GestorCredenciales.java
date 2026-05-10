@@ -424,7 +424,7 @@ public class GestorCredenciales {
             int filasActualizadas = sentencia.executeUpdate();
 
             if (filasActualizadas == 0) {
-                throw new SQLException("No se pudo actualizar la credencial");
+                throw new SQLException(GestorIdiomas.getText("excepcion.actualizarcredencial")); // "No se pudo actualizar la credencial"
             }
 
 
@@ -466,7 +466,7 @@ public class GestorCredenciales {
 
             if (filasEliminadas == 0) {
 
-                throw new SQLException("No se pudo eliminar la credencial");
+                throw new SQLException(GestorIdiomas.getText("excepcion.eliminarcredencial")); // "No se pudo eliminar la credencial"
             }
         }
 
@@ -509,7 +509,7 @@ public class GestorCredenciales {
             int filasActualizadas = sentencia.executeUpdate();
 
             if (filasActualizadas == 0) {
-                throw new SQLException("No se pudo actualizar el password de la credencial");
+                throw new SQLException(GestorIdiomas.getText("excepcion.actualizarpassword")); // "No se pudo actualizar el password de la credencial"
             }
 
             credencial.setPassword(nuevoPassword);
@@ -574,7 +574,7 @@ public class GestorCredenciales {
             }
 
         }
-        throw new SQLException("No se pudo obtener el id de la credencial");
+        throw new SQLException(GestorIdiomas.getText("excepcion.idcredencial")); // "No se pudo obtener el id de la credencial"
     }
 
     private String normalizarTextoOpcional(String texto) {

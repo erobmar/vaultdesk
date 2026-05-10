@@ -43,7 +43,7 @@ public class GestorPasswords {
             return false;
         }
         if (credencial == null) {
-            throw new IllegalArgumentException("La credencial no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.credencialnula")); // "La credencial no puede ser nula"
         }
 
         return cumpleRequisitosPassword(
@@ -137,7 +137,7 @@ public class GestorPasswords {
     public String generarPassword(Credencial credencial) {
 
         if (credencial == null) {
-            throw new IllegalArgumentException("La credencial no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.credencialnula")); // "La credencial no puede ser nula"
         }
 
         int longitud = normalizarLongitud(credencial.getReqLongitud());
@@ -180,7 +180,7 @@ public class GestorPasswords {
         int sumaRequisitos = mayusculas + minusculas + digitos + especiales;
 
         if (sumaRequisitos > longitud) {
-            throw new IllegalArgumentException("La suma de requisitos supera la longitud de contraseña establecida");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.requisitos")); // "La suma de requisitos supera la longitud de contraseña establecida"
         }
 
         char[] password = new char[longitud];

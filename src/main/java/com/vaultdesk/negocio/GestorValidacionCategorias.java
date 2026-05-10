@@ -33,7 +33,7 @@ public class GestorValidacionCategorias {
      */
     public void validarConexion(Connection conexion) {
         if (conexion == null) {
-            throw new IllegalArgumentException("La conexión no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.conexionnula")); // "La conexión no puede ser nula"
         }
     }
 
@@ -47,16 +47,16 @@ public class GestorValidacionCategorias {
     public void validarCategoriaCreacion(Categoria categoria) {
         if (categoria.getIdCategoria() == 1) {
 
-            throw new IllegalArgumentException("No se puede modificar/eliminar la categoría por defecto");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categoriadefault")); // "No se puede modificar/eliminar la categoría por defecto"
         }
 
         if (categoria == null) {
 
-            throw new IllegalArgumentException("La categoría no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categorianula")); // "La categoría no puede ser nula"
         }
 
         if (categoria.getNombre() == null || categoria.getNombre().isBlank()) {
-            throw new IllegalArgumentException("El nombre de la categoría no puede ser nulo");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categoriasinnombre")); // "El nombre de la categoría no puede ser nulo"
         }
     }
 
@@ -68,22 +68,22 @@ public class GestorValidacionCategorias {
      */
     public void validarCategoriaEdicion(Categoria categoria) {
         if (categoria == null) {
-            throw new IllegalArgumentException("La categoría no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categorianula")); // "La categoría no puede ser nula"
         }
 
         if (categoria.getIdCategoria() <= 0) {
 
-            throw new IllegalArgumentException("Id de categoría no válido");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.idcategoria")); // "Id de categoría no válido"
         }
 
         if (categoria.getIdCategoria() == 1) {
 
-            throw new IllegalArgumentException("La categoría 'Otros' no puede ser editada");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.editarotros")); // "La categoría 'Otros' no puede ser editada"
         }
 
         if (categoria.getNombre() == null || categoria.getNombre().trim().isEmpty()) {
 
-            throw new IllegalArgumentException("La categoría debe tener un nombre");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categoriasinnombre")); // "La categoría debe tener un nombre"
         }
 
     }
@@ -96,7 +96,7 @@ public class GestorValidacionCategorias {
      */
     public void validarCategoriaEliminacion(int idCategoria) {
         if (idCategoria <= 1) {
-            throw new IllegalArgumentException("El id de categoría debe ser mayor de 1");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.idcategorianegativo")); // "El id de categoría debe ser mayor de 1"
         }
     }
 
@@ -109,10 +109,10 @@ public class GestorValidacionCategorias {
     public void validarCategoriaReasignacion(int idCategoriaOriginal) {
 
         if (idCategoriaOriginal <= 0) {
-            throw new IllegalArgumentException("El id de la categoría debe ser mayor de 1");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.idcategorianegativa")); // "El id de la categoría debe ser mayor de 1"
         }
         if (idCategoriaOriginal == 1) {
-            throw new IllegalArgumentException("La categoría con id=1 ('Otros') no se puede reasignar a sí misma");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.reasignarotros")); // "La categoría con id=1 ('Otros') no se puede reasignar a sí misma"
         }
 
     }
@@ -140,7 +140,7 @@ public class GestorValidacionCategorias {
             try (ResultSet resultado = sentencia.executeQuery()) {
 
                 if (resultado.next() && resultado.getInt(1) > 0) {
-                    throw new IllegalArgumentException("Ya existe una categoría con ese nombre");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.nombrecategoriaexiste"));  // "Ya existe una categoría con ese nombre"
                 }
 
             }
@@ -174,7 +174,7 @@ public class GestorValidacionCategorias {
             try (ResultSet setResultados = sentencia.executeQuery()) {
 
                 if (setResultados.next() && setResultados.getInt(1) == 0) {
-                    throw new IllegalArgumentException("La categoria no existe");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categorianoexiste")); // "La categoria no existe"
                 }
             }
         }
@@ -209,7 +209,7 @@ public class GestorValidacionCategorias {
 
                 if (setResultado.next() && setResultado.getInt(1) > 0) {
 
-                    throw new IllegalArgumentException("Ya existe otra categoría con ese nombre");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categoriayaexiste")); // "Ya existe otra categoría con ese nombre"
                 }
             }
         }

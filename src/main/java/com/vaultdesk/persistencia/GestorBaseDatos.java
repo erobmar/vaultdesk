@@ -1,5 +1,6 @@
 package com.vaultdesk.persistencia;
 
+import com.vaultdesk.negocio.GestorIdiomas;
 import org.sqlite.SQLiteConnection;
 
 import java.sql.Connection;
@@ -52,7 +53,7 @@ public class GestorBaseDatos {
     public byte[] serializarBaseDatos(Connection conexion) throws SQLException {
 
         if (conexion == null) {
-            throw new IllegalArgumentException("La conexión no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.conexion")); // "La conexión no puede ser nula"
         }
 
         SQLiteConnection conexionSQLite = conexion.unwrap(SQLiteConnection.class);
@@ -70,7 +71,7 @@ public class GestorBaseDatos {
     public Connection cargarBaseDatosDesdeBytes(byte[] datoBaseDatos) throws SQLException {
 
         if (datoBaseDatos == null || datoBaseDatos.length == 0) {
-            throw new IllegalArgumentException("La base de datos no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.basedatosnula")); // "La base de datos no puede ser nula"
         }
 
         Connection conexion = abrirConexionEnMemoria();
@@ -180,7 +181,9 @@ public class GestorBaseDatos {
                     INSERT INTO idioma (id_idioma, nombre)
                     VALUES
                         (1, 'Español'),
-                        (2, 'English')
+                        (2, 'English'),
+                        (3, 'Català'),
+                        (4, 'Asturianu')
                     """);
 
             sentenciaCreacionSemilla.execute("""

@@ -4,6 +4,7 @@ import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Idioma;
 import com.vaultdesk.dominio.TemaVisual;
 import com.vaultdesk.negocio.GestorAjustes;
+import com.vaultdesk.negocio.GestorIdiomas;
 
 import java.sql.Connection;
 import java.util.List;
@@ -89,7 +90,9 @@ public class ControladorAjustes {
 
         controladorPrincipal.actualizarTituloVentana();
 
-        controladorPrincipal.mostrarMensajeInformacion("Ajustes", "Los ajustes se han actualizado correctamente");
+        controladorPrincipal.mostrarMensajeInformacion(
+                GestorIdiomas.getText("alerta.updateajustes.title"),
+                GestorIdiomas.getText("alerta.updateajustes.content")); // "Ajustes", "Los ajustes se han actualizado correctamente"
 
 
     }
