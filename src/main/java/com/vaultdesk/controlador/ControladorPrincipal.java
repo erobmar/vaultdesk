@@ -300,6 +300,18 @@ public class ControladorPrincipal {
             primaryStage.getScene().getStylesheets().remove(getClass().getResource("/css/accesibilidad.css").toExternalForm());
         }
 
+        if(bovedaActual.getTemaVisual().getIdTemaVisual() == 1){
+
+            if(primaryStage.getScene().getStylesheets().contains(getClass().getResource("/css/temaOscuro.css").toExternalForm())){
+
+                primaryStage.getScene().getStylesheets().remove(getClass().getResource("/css/temaOscuro.css").toExternalForm());
+            }
+        } else if(bovedaActual.getTemaVisual().getIdTemaVisual() == 2){
+
+            primaryStage.getScene().getStylesheets().add(getClass().getResource("/css/temaOscuro.css").toExternalForm());
+
+        }
+
         primaryStage.setTitle(titulo);
 
 

@@ -1,0 +1,54 @@
+.root {
+    -fx-base: #2b2b2b;
+    -fx-background-color: #2b2b2b;
+    -fx-control-inner-background: #3c3f41;
+    -fx-text-fill: #eeeeee;
+}
+
+.label {
+    -fx-text-fill: #eeeeee;
+}
+
+.button {
+    -fx-background-color: #4a4d50;
+    -fx-text-fill: #ffffff;
+}
+
+.text-field,
+.password-field,
+.text-area,
+.combo-box {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: #ffffff;
+}
+
+.table-view {
+    -fx-background-color: #2b2b2b;
+    -fx-control-inner-background: #3c3f41;
+}
+
+.table-view .column-header,
+.table-view .column-header-background {
+    -fx-background-color: #4a4d50;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #ffffff;
+}
+
+.tab-pane,
+.tab {
+    -fx-background-color: #2b2b2b;
+}
+
+.menu-bar,
+.menu,
+.menu-item,
+.context-menu {
+    -fx-background-color: #3c3f41;
+}
+
+.menu .label,
+.menu-item .label {
+    -fx-text-fill: #ffffff;
+}

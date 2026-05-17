@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.dominio.TemaVisual;
 import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -106,6 +107,8 @@ public class VistaPrincipal {
 
 
     }
+
+
 
     private void exportarCredenciales(BorderPane root) {
         boolean confirmado = controladorPrincipal.confirmarExportacion();

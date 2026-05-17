@@ -171,7 +171,7 @@ public class GestorAjustes {
         bovedaActual.setModificadaSinGuardar(true);
 
         GestorIdiomas.cambiarIdioma(IdiomaEnum.getCodigoDesdeId(idioma.getIdIdioma()).getCodigo());
-
+        
 
     }
 
