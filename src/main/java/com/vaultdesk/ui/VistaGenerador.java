@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,20 +33,20 @@ public class VistaGenerador {
         parrilla.setPadding(new Insets(15));
 
         TextField campoLogintud = new TextField();
-        campoLogintud.setPromptText("Longitud");
+        campoLogintud.setPromptText(GestorIdiomas.getText("prompt.longitud")); // "Longitud"
         TextField campoMayusculas = new TextField();
-        campoMayusculas.setPromptText("Mínimo mayúsculas");
+        campoMayusculas.setPromptText(GestorIdiomas.getText("prompt.mayusculas")); // "Mínimo mayúsculas"
         TextField campoMinusculas = new TextField();
-        campoMinusculas.setPromptText("Mínimo minúsculas");
+        campoMinusculas.setPromptText(GestorIdiomas.getText("prompt.minusculas")); // "Mínimo minúsculas"
         TextField campoDigitos = new TextField();
-        campoDigitos.setPromptText("Mínimo dígitos");
+        campoDigitos.setPromptText(GestorIdiomas.getText("prompt.digitos")); // "Mínimo dígitos"
         TextField campoEspeciales = new TextField();
-        campoEspeciales.setPromptText("Caracteres especiales");
+        campoEspeciales.setPromptText(GestorIdiomas.getText("prompt.especiales")); // "Caracteres especiales"
         TextField campoResultado = new TextField();
         campoResultado.setEditable(false);
 
-        Button botonGenerar = new Button("Generar contraseña");
-        Button botonCopiar = new Button("Copiar al portapapeles");
+        Button botonGenerar = new Button(GestorIdiomas.getText("boton.generar")); // "Generar contraseña"
+        Button botonCopiar = new Button(GestorIdiomas.getText("boton.copiarportapapeles")); // "Copiar al portapapeles"
 
         Label etiquetaError = new Label();
         etiquetaError.setStyle("-fx-text-fill: red;");
@@ -78,19 +79,19 @@ public class VistaGenerador {
 
         int fila = 0;
 
-        parrilla.add(new Label("Longitud mínima"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.longitudminima")), 0, fila); // "Longitud mínima"
         parrilla.add(campoLogintud, 1, fila++);
 
-        parrilla.add(new Label("Mínimo de mayúsculas"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.minimomayusculas")), 0, fila); // "Mínimo de mayúsculas"
         parrilla.add(campoMayusculas, 1, fila++);
 
-        parrilla.add(new Label("Mínimo de minúsculas"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.minimominusculas")), 0, fila); // "Mínimo de minúsculas"
         parrilla.add(campoMinusculas, 1, fila++);
 
-        parrilla.add(new Label("Mínimo de dígitos"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.minimodigitos")), 0, fila); // "Mínimo de dígitos"
         parrilla.add(campoDigitos, 1, fila++);
 
-        parrilla.add(new Label("Caracteres especiales"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.minimoespeciales")), 0, fila); // "Caracteres especiales"
         parrilla.add(campoEspeciales, 1, fila++);
 
         parrilla.add(botonGenerar, 0, fila);

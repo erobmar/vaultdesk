@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -28,18 +29,18 @@ public class VistaPrincipal {
 
 
         // Menú Archivo...
-        Menu menuArchivo = new Menu("Archivo");
+        Menu menuArchivo = new Menu(GestorIdiomas.getText("menu.archivo")); // "Archivo"
 
-        MenuItem itemCerrarBoveda = new MenuItem("Cerrar bóveda");
+        MenuItem itemCerrarBoveda = new MenuItem(GestorIdiomas.getText("menu.cerrarboveda")); // "Cerrar bóveda"
         itemCerrarBoveda.setOnAction(e -> controladorPrincipal.cerrarBoveda());
 
-        MenuItem itemGuardarBoveda = new MenuItem("Guardar bóveda...");
+        MenuItem itemGuardarBoveda = new MenuItem(GestorIdiomas.getText("menu.guardarboveda")); // "Guardar bóveda..."
         itemGuardarBoveda.setOnAction(e -> controladorPrincipal.guardarBoveda());
 
-        MenuItem itemExportarACsv = new MenuItem("Exportar credendiales a CSV...");
+        MenuItem itemExportarACsv = new MenuItem(GestorIdiomas.getText("menu.exportar")); // "Exportar credendiales a CSV..."
         itemExportarACsv.setOnAction(e -> exportarCredenciales(root));
 
-        MenuItem itemSalir = new MenuItem("Salir");
+        MenuItem itemSalir = new MenuItem(GestorIdiomas.getText("menu.salir")); // "Salir"
         itemSalir.setOnAction(e -> controladorPrincipal.salirAplicacion());
 
         menuArchivo.getItems().addAll(
@@ -51,9 +52,9 @@ public class VistaPrincipal {
                 itemSalir);
 
         // Menú Bóveda
-        Menu menuBoveda = new Menu("Bóveda");
+        Menu menuBoveda = new Menu(GestorIdiomas.getText("menu.boveda")); // "Bóveda"
 
-        MenuItem itemCambiarPassword = new MenuItem("Cambiar contraseña maestra...");
+        MenuItem itemCambiarPassword = new MenuItem(GestorIdiomas.getText("menu.cambiarpassword")); // "Cambiar contraseña maestra..."
         itemCambiarPassword.setOnAction(e -> controladorPrincipal.cambiarPasswordMaestra());
 
         menuBoveda.getItems().add(itemCambiarPassword);
@@ -68,11 +69,11 @@ public class VistaPrincipal {
 
         TabPane panelPestanas = new TabPane();
 
-        Tab pestanaCredenciales = new Tab("Credenciales", vistaCredenciales.crearContenido());
-        Tab pestanaCategorias = new Tab("Categorias", vistaCategorias.crearContenido());
-        Tab pestanaGenerador = new Tab("Generador", vistaGenerador.crearContenido());
-        Tab pestanaAlertas = new Tab("Alertas", vistaAlertas.crearContenido());
-        Tab pestanaAjustes = new Tab("Ajustes", vistaAjustes.crearContenido());
+        Tab pestanaCredenciales = new Tab(GestorIdiomas.getText("menu.tabcredenciales"), vistaCredenciales.crearContenido()); // "Credenciales"
+        Tab pestanaCategorias = new Tab(GestorIdiomas.getText("menu.tabcategorias"), vistaCategorias.crearContenido()); // "Categorias"
+        Tab pestanaGenerador = new Tab(GestorIdiomas.getText("menu.generador"), vistaGenerador.crearContenido()); // "Generador"
+        Tab pestanaAlertas = new Tab(GestorIdiomas.getText("menu.alertas"), vistaAlertas.crearContenido()); // "Alertas"
+        Tab pestanaAjustes = new Tab(GestorIdiomas.getText("menu.ajustes"), vistaAjustes.crearContenido()); // "Ajustes"
 
         pestanaCredenciales.setClosable(false);
         pestanaCategorias.setClosable(false);
@@ -114,9 +115,9 @@ public class VistaPrincipal {
         }
 
         FileChooser selectorArchivos = new FileChooser();
-        selectorArchivos.setTitle("Exportar credenciales a CSV");
+        selectorArchivos.setTitle(GestorIdiomas.getText("selectorarchivos.exportar.title")); // "Exportar credenciales a CSV"
         selectorArchivos.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Archivos CSV", "*.csv")
+                new FileChooser.ExtensionFilter(GestorIdiomas.getText("selectorarchivos.exportar.filter"), "*.csv") // "Archivos CSV"
         );
         selectorArchivos.setInitialFileName("credenciales.csv");
 
@@ -130,15 +131,15 @@ public class VistaPrincipal {
             controladorPrincipal.exportarACsv(archivoSalida.toPath());
 
             Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-            alerta.setTitle("Exportación completada");
+            alerta.setTitle(GestorIdiomas.getText("alerta.exportacioncompletada.title")); // "Exportación completada"
             alerta.setHeaderText(null);
-            alerta.setContentText("Se ha completado la exportación correctamente");
+            alerta.setContentText(GestorIdiomas.getText("alerta.exportacioncompletada.content")); // "Se ha completado la exportación correctamente"
             alerta.showAndWait();
         } catch (Exception e) {
 
             Alert alerta = new Alert(Alert.AlertType.ERROR);
-            alerta.setTitle("Error en la exportación");
-            alerta.setHeaderText("No se ha podido realizar la exportación");
+            alerta.setTitle(GestorIdiomas.getText("alerta.errorexportacion.title")); // "Error en la exportación"
+            alerta.setHeaderText(GestorIdiomas.getText("alerta.errorexportacion.header")); // "No se ha podido realizar la exportación"
             alerta.setContentText(e.getMessage());
             alerta.showAndWait();
 

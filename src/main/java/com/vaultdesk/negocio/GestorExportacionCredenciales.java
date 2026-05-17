@@ -35,10 +35,10 @@ public class GestorExportacionCredenciales {
     public void exportarCredencialesCSV(List<Credencial> credenciales, Path rutaDestino) throws Exception {
 
         if (credenciales == null) {
-            throw new IllegalArgumentException("La lista de credenciales no puede ser null");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.sinlistacredenciales")); // "La lista de credenciales no puede ser null"
         }
         if (rutaDestino == null) {
-            throw new IllegalArgumentException("Debes especificar una ruta para la exportación");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.sinrutaexportacion")); // "Debes especificar una ruta para la exportación"
         }
         try (BufferedWriter bufferEscritura = Files.newBufferedWriter(rutaDestino, StandardCharsets.UTF_8)) {
             bufferEscritura.write("id,url_identificador,username,password,categoria,destacada,caduca,fecha_caducidad,periodo_caducidad,ultimo_update,anotaciones");

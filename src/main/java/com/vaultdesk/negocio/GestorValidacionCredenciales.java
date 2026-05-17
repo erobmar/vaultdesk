@@ -33,7 +33,7 @@ public class GestorValidacionCredenciales {
      */
     public void validarConexion(Connection conexion) {
         if (conexion == null) {
-            throw new IllegalArgumentException("La conexión no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("expcepcion.conexion")); // "La conexión no puede ser nula"
         }
     }
 
@@ -46,7 +46,7 @@ public class GestorValidacionCredenciales {
      */
     public void validarBoveda(int idBoveda) {
         if (idBoveda < 1) {
-            throw new IllegalArgumentException("El id de la bóveda es incorrecto");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.idboveda")); // "El id de la bóveda es incorrecto"
         }
     }
 
@@ -59,19 +59,19 @@ public class GestorValidacionCredenciales {
      */
     public void validarCredencial(Credencial credencial) {
         if (credencial == null) {
-            throw new IllegalArgumentException("La credencial no puede ser nula");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.credencialnula")); // "La credencial no puede ser nula"
         }
         if (credencial.getUrlIdentificador() == null || credencial.getUrlIdentificador().isEmpty()) {
-            throw new IllegalArgumentException("El campo 'URL/Identificador' no puede estar vacío");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.urlvacia")); // "El campo 'URL/Identificador' no puede estar vacío"
         }
         if (credencial.getUsername() == null || credencial.getUsername().isEmpty()) {
-            throw new IllegalArgumentException("El campo 'Nombre de usuario' no puede estar vacío");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.usuariovacio")); // "El campo 'Nombre de usuario' no puede estar vacío"
         }
         if (credencial.getPassword() == null || credencial.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("El campo 'Contraseña' no puede estar vacío");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.passwordvacia")); // "El campo 'Contraseña' no puede estar vacío"
         }
         if (credencial.getIdCredencial() < 0) {
-            throw new IllegalArgumentException("El id de credencial no es válido");
+            throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.idcredencialnegativo")); // "El id de credencial no es válido"
         }
     }
 
@@ -93,7 +93,7 @@ public class GestorValidacionCredenciales {
 
             try (ResultSet resultado = sentencia.executeQuery()) {
                 if (resultado.next() && resultado.getInt(1) == 0) {
-                    throw new IllegalArgumentException("La bóveda indicada no existe");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.bovedanoexiste")); // "La bóveda indicada no existe"
                 }
             }
         }
@@ -117,7 +117,7 @@ public class GestorValidacionCredenciales {
             try (ResultSet resultado = sentencia.executeQuery()) {
 
                 if (resultado.next() && resultado.getInt(1) == 0) {
-                    throw new IllegalArgumentException("La categoría indicada no existe");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.categorianoexiste")); // "La categoría indicada no existe"
                 }
             }
         }
@@ -146,7 +146,7 @@ public class GestorValidacionCredenciales {
             try (ResultSet resultado = sentecia.executeQuery()) {
 
                 if (resultado.next() && resultado.getInt(1) == 0) {
-                    throw new IllegalArgumentException("La credencial indicada no existe en la bóveda");
+                    throw new IllegalArgumentException(GestorIdiomas.getText("excepcion.credencialnoenboveda")); // "La credencial indicada no existe en la bóveda"
                 }
             }
 

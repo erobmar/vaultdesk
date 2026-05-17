@@ -4,6 +4,7 @@ import com.vaultdesk.controlador.ControladorPrincipal;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Idioma;
 import com.vaultdesk.dominio.TemaVisual;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -32,13 +33,13 @@ public class VistaAjustes {
 
         TextField campoUmbralAlerta = new TextField();
 
-        CheckBox checkBoxAccesibilidad = new CheckBox("Activar opciones de accesibilidad");
+        CheckBox checkBoxAccesibilidad = new CheckBox(GestorIdiomas.getText("check.accesibilidad")); // "Activar opciones de accesibilidad"
 
         ComboBox<Idioma> comboBoxIdiomas = new ComboBox<>();
         ComboBox<TemaVisual> comboBoxTemasVisuales = new ComboBox<>();
 
-        Button botonGuardar = new Button("Guardar");
-        Button botonCancelar = new Button("Cancelar");
+        Button botonGuardar = new Button(GestorIdiomas.getText("boton.guardar")); // "Guardar"
+        Button botonCancelar = new Button(GestorIdiomas.getText("boton.cancelar")); // "Cancelar"
 
         Label etiquetaError = new Label();
 
@@ -55,7 +56,7 @@ public class VistaAjustes {
             cargarValoresActuales(campoUmbralAlerta, checkBoxAccesibilidad, comboBoxIdiomas, comboBoxTemasVisuales);
 
         } catch (Exception e) {
-            root.setCenter(new Label("Error al cargar ajustes" + e.getMessage()));
+            root.setCenter(new Label(GestorIdiomas.getText("label.errorajustes") + e.getMessage())); // "Error al cargar ajustes"
             return root;
         }
 
@@ -73,9 +74,9 @@ public class VistaAjustes {
                 etiquetaError.setText("");
 
             } catch (NumberFormatException ex) {
-                etiquetaError.setText("El umbral de alerta debe ser un número entero");
+                etiquetaError.setText(GestorIdiomas.getText("label.errorvalidacionumbral")); // "El umbral de alerta debe ser un número entero"
             } catch (Exception ex) {
-                etiquetaError.setText("Error: " + ex.getMessage());
+                etiquetaError.setText(GestorIdiomas.getText("label.error") + ex.getMessage()); // "Error: "
             }
         });
 
@@ -91,16 +92,16 @@ public class VistaAjustes {
 
         int fila = 0;
 
-        parrilla.add(new Label("Umbral de alerta (días)"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.umbral")), 0, fila); // "Umbral de alerta (días)"
         parrilla.add(campoUmbralAlerta, 1, fila++);
 
-        parrilla.add(new Label("Accesibilidad"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.accesibilidad")), 0, fila); // "Accesibilidad"
         parrilla.add(checkBoxAccesibilidad, 1, fila++);
 
-        parrilla.add(new Label("Idioma"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.idioma")), 0, fila); // "Idioma"
         parrilla.add(comboBoxIdiomas, 1, fila++);
 
-        parrilla.add(new Label("Tema visual"), 0, fila);
+        parrilla.add(new Label(GestorIdiomas.getText("label.temavisual")), 0, fila); // "Tema visual"
         parrilla.add(comboBoxTemasVisuales, 1, fila++);
 
         parrilla.add(botonGuardar, 0, fila);
@@ -135,7 +136,14 @@ public class VistaAjustes {
         checkBoxAccesibilidad.setSelected(boveda.isAccesibilidad());
 
         if (boveda.getIdioma() != null) {
-            seleccionarIdioma(comboBoxIdiomas, boveda.getIdioma().getIdIdioma());
+
+            for(Idioma idioma : comboBoxIdiomas.getItems()){
+                if(idioma.getIdIdioma() == boveda.getIdioma().getIdIdioma()){
+                    comboBoxIdiomas.getSelectionModel().select(idioma);
+                }
+            }
+
+            //seleccionarIdioma(comboBoxIdiomas, boveda.getIdioma().getIdIdioma());
         }
         if (boveda.getTemaVisual() != null) {
             seleccionarTemaVisual(comboBoxTemasVisuales, boveda.getTemaVisual().getIdTemaVisual());

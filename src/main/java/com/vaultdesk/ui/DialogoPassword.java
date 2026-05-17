@@ -1,5 +1,6 @@
 package com.vaultdesk.ui;
 
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -29,17 +30,17 @@ public class DialogoPassword {
 
         dialogo.initOwner(escena);
         dialogo.initModality(Modality.APPLICATION_MODAL);
-        dialogo.setTitle("Contraseña maestra");
+
         dialogo.setHeaderText(mensaje);
 
         PasswordField password = new PasswordField();
-        password.setPromptText("Contraseña maestra");
+        password.setPromptText(GestorIdiomas.getText("prompt.passwordmaestra")); // "Contraseña maestra"
 
-        VBox cajavertical = new VBox(10, new Label("Contraseña"), password);
+        VBox cajavertical = new VBox(10, new Label(GestorIdiomas.getText("label.passwordmaestra")), password); // "Contraseña"
         dialogo.getDialogPane().setContent(cajavertical);
 
-        ButtonType botonAceptar = new ButtonType("Aceptar", ButtonBar.ButtonData.OK_DONE);
-        ButtonType botonCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType botonAceptar = new ButtonType(GestorIdiomas.getText("boton.aceptar"), ButtonBar.ButtonData.OK_DONE); // "Aceptar"
+        ButtonType botonCancelar = new ButtonType(GestorIdiomas.getText("boton.cancelar"), ButtonBar.ButtonData.CANCEL_CLOSE); // "Cancelar"
 
         dialogo.getDialogPane().getButtonTypes().addAll(botonAceptar, botonCancelar);
 
@@ -70,12 +71,12 @@ public class DialogoPassword {
         Stage dialogo = new Stage();
         dialogo.initOwner(escena);
         dialogo.initModality(Modality.APPLICATION_MODAL);
-        dialogo.setTitle("Contraseña maestra");
+        dialogo.setTitle(GestorIdiomas.getText("dialogo.password.title")); // "Contraseña maestra"
 
         PasswordField campoPassword = new PasswordField();
 
-        Button botonAceptar = new Button("Aceptar");
-        Button botonCancelar = new Button("Cancelar");
+        Button botonAceptar = new Button(GestorIdiomas.getText("boton.aceptar")); // "Aceptar"
+        Button botonCancelar = new Button(GestorIdiomas.getText("boton.cancelar")); // "Cancelar"
 
         botonAceptar.setOnAction(e -> {
             resultado[0] = campoPassword.getText().toCharArray();
@@ -92,7 +93,7 @@ public class DialogoPassword {
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
         root.getChildren().addAll(
-                new Label("Introduce la contraseña maestra"),
+                new Label(GestorIdiomas.getText("label.introducepassword")), // "Introduce la contraseña maestra"
                 campoPassword,
                 botones
         );

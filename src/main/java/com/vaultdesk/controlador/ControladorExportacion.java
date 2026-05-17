@@ -3,6 +3,7 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Credencial;
 import com.vaultdesk.negocio.GestorCredenciales;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -43,17 +44,17 @@ public class ControladorExportacion {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No existe ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No existe ninguna conexión activa"
         }
 
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda abierta"
         }
 
         List<Credencial> listaCredenciales = controladorPrincipal.obtenerCredenciales();
 
         if (listaCredenciales.isEmpty()) {
-            throw new IllegalStateException("No hay credenciales para exportar");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.sincredenciales")); // "No hay credenciales para exportar"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
@@ -71,9 +72,9 @@ public class ControladorExportacion {
     public boolean confirmarExportacion() {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("Exportar credenciales");
-        alerta.setHeaderText("Vas a exportar tus credenciales en formato visible");
-        alerta.setContentText("¿Deseas continuar?");
+        alerta.setTitle(GestorIdiomas.getText("alerta.exportar.title")); // "Exportar credenciales"
+        alerta.setHeaderText(GestorIdiomas.getText("alerta.exportar.header")); // "Vas a exportar tus credenciales en formato visible"
+        alerta.setContentText(GestorIdiomas.getText("alerta.exportar.content")); // "¿Deseas continuar?"
 
         alerta.getDialogPane().setMinWidth(450);
 

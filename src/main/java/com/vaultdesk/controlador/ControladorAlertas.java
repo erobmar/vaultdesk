@@ -3,6 +3,7 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Credencial;
 import com.vaultdesk.negocio.GestorCredenciales;
+import com.vaultdesk.negocio.GestorIdiomas;
 import com.vaultdesk.ui.AlertaCaducidad;
 
 import java.sql.Connection;
@@ -42,10 +43,10 @@ public class ControladorAlertas {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda activa"
         }
 
         List<Credencial> listaCredenciales = controladorPrincipal.obtenerCredenciales();

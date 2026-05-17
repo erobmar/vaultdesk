@@ -166,8 +166,12 @@ public class GestorAjustes {
 
         bovedaActual.setUmbralAlerta(umbralAlerta);
         bovedaActual.setAccesibilidad(accesibilidad);
+        bovedaActual.setIdioma(idioma);
         bovedaActual.setTemaVisual(temaVisual);
         bovedaActual.setModificadaSinGuardar(true);
+
+        GestorIdiomas.cambiarIdioma(IdiomaEnum.getCodigoDesdeId(idioma.getIdIdioma()).getCodigo());
+
 
     }
 
@@ -177,7 +181,7 @@ public class GestorAjustes {
      */
     private void validarConexion(Connection conexionActual) throws SQLException {
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
     }
 

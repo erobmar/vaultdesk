@@ -3,6 +3,7 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.negocio.GestorCategorias;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -46,13 +47,13 @@ public class ControladorCategorias {
         Connection conexionActual = controladorPrincipal.getConexionActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
 
         try {
             return gestorCategorias.obtenerCategorias(conexionActual);
         } catch (Exception e) {
-            throw new RuntimeException("Error al obtener categorías", e);
+            throw new RuntimeException(GestorIdiomas.getText("excepcion.obtencioncategorias"), e); // "Error al obtener categorías"
         }
 
     }
@@ -74,10 +75,10 @@ public class ControladorCategorias {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda abierta"
         }
 
         Categoria categoria = new Categoria();
@@ -109,10 +110,10 @@ public class ControladorCategorias {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión abierta"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda abierta"
         }
 
         Categoria categoria = new Categoria();
@@ -142,10 +143,10 @@ public class ControladorCategorias {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda abierta"
         }
 
         gestorCategorias.eliminarCategoria(conexionActual, categoria.getIdCategoria());
@@ -165,9 +166,9 @@ public class ControladorCategorias {
     public boolean confirmarEliminacionCategoria(Categoria categoria) {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("Eliminar categoría");
-        alerta.setHeaderText("Va a eliminar la categoría " + categoria.getNombre());
-        alerta.setContentText("Las credenciales asignadas se reasignarán a 'Otros'. ¿Desea continuar?");
+        alerta.setTitle(GestorIdiomas.getText("alerta.eliminarcategoria.title")); // "Eliminar categoría"
+        alerta.setHeaderText(GestorIdiomas.getText("alerta.eliminarcategoria.header") + " " + categoria.getNombre()); // "Va a eliminar la categoría "
+        alerta.setContentText(GestorIdiomas.getText("alerta.eliminarcategoria.content")); // "Las credenciales asignadas se reasignarán a 'Otros'. ¿Desea continuar?"
 
         Optional<ButtonType> respuesta = alerta.showAndWait();
 

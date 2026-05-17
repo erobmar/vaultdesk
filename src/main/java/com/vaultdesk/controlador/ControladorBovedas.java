@@ -3,6 +3,7 @@ package com.vaultdesk.controlador;
 import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.negocio.ExcepcionIntegridadBoveda;
 import com.vaultdesk.negocio.GestorBovedas;
+import com.vaultdesk.negocio.GestorIdiomas;
 import com.vaultdesk.negocio.GestorRutasAplicacion;
 import com.vaultdesk.persistencia.GestorBaseDatos;
 import com.vaultdesk.persistencia.GestorPersistencia;
@@ -59,8 +60,9 @@ public class ControladorBovedas {
         GestorRutasAplicacion gestorRutasAplicacion = new GestorRutasAplicacion();
 
         FileChooser selectorArchivos = new FileChooser();
-        selectorArchivos.setTitle("Abrir bóveda");
-        selectorArchivos.getExtensionFilters().add(new FileChooser.ExtensionFilter("Bovedas VaultDesk (*.vlt)", "*.vlt"));
+        selectorArchivos.setTitle(GestorIdiomas.getText("selectorarchivos.abrirboveda.title")); // "Abrir bóveda"
+        selectorArchivos.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                GestorIdiomas.getText("selectorarchivos.filter.text"), "*.vlt")); // "Bovedas VaultDesk (*.vlt)"
 
         selectorArchivos.setInitialDirectory(gestorRutasAplicacion.obtenerDirectorioBovedas().toFile());
 
@@ -74,7 +76,7 @@ public class ControladorBovedas {
 
         DialogoPassword dialogoPassword = new DialogoPassword(primaryStage);
 
-        dialogoPassword.mostrar("Introduzca la contraseña maestra de la bóveda",
+        dialogoPassword.mostrar(GestorIdiomas.getText("dialogopassword.content.simple"), // "Introduzca la contraseña maestra de la bóveda"
                 passwordMaestra -> {
 
                     if (passwordMaestra == null || passwordMaestra.length == 0) {
@@ -97,10 +99,13 @@ public class ControladorBovedas {
                         controladorPrincipal.mostrarVistaPrincipal();
 
                     } catch (ExcepcionIntegridadBoveda e) {
-                        controladorPrincipal.mostrarMensajeError("No se pudo abrir la bóveda", e.getMessage());
+                        controladorPrincipal.mostrarMensajeError(
+                                GestorIdiomas.getText("error.integridad.content"), e.getMessage()); // "No se pudo abrir la bóveda"
                     } catch (Exception e) {
                         e.printStackTrace();
-                        controladorPrincipal.mostrarMensajeError("Error al abrir la bóveda", e.getClass().getSimpleName() + ": " + e.getMessage());
+                        controladorPrincipal.mostrarMensajeError(
+                                GestorIdiomas.getText("error.aperturaboveda.content"),
+                                e.getClass().getSimpleName() + ": " + e.getMessage()); // "Error al abrir la bóveda"
                     } finally {
 
                         Arrays.fill(passwordMaestra, '\0');
@@ -134,7 +139,8 @@ public class ControladorBovedas {
 
         } catch (Exception e) {
 
-            controladorPrincipal.mostrarMensajeError("Error al cerrar la bóveda", e.getMessage());
+            controladorPrincipal.mostrarMensajeError(
+                    GestorIdiomas.getText("error.cierreboveda.content"), e.getMessage()); // "Error al cerrar la bóveda"
         }
     }
 
@@ -153,7 +159,9 @@ public class ControladorBovedas {
         Path rutaBoveda = controladorPrincipal.getRutaBoveda();
 
         if (conexionActual == null || rutaBoveda == null) {
-            controladorPrincipal.mostrarMensajeError("Error", "No hay ninguna bóveda abierta");
+            controladorPrincipal.mostrarMensajeError(
+                    GestorIdiomas.getText("error.generico.title"),
+                    GestorIdiomas.getText("error.bovedaabierta.content")); // "Error", "No hay ninguna bóveda abierta"
             return false;
         }
 
@@ -163,7 +171,9 @@ public class ControladorBovedas {
 
         try {
             gestorPersistencia.guardarBovedaDesdeMemoria(rutaBoveda, passwordMaestra, conexionActual);
-            controladorPrincipal.mostrarMensajeInformacion("Guardar bóveda", "La bóveda se ha guardado correctamente");
+            controladorPrincipal.mostrarMensajeInformacion(
+                    GestorIdiomas.getText("informacion.guardarboveda.title"),
+                    GestorIdiomas.getText("informacion.guardarboveda.content")); // "Guardar bóveda", "La bóveda se ha guardado correctamente"
 
             if (bovedaActual != null) {
                 bovedaActual.setModificadaSinGuardar(false);
@@ -175,7 +185,9 @@ public class ControladorBovedas {
         } catch (Exception e) {
 
             e.printStackTrace();
-            controladorPrincipal.mostrarMensajeError("Error al guardar la bóveda", e.getClass().getSimpleName() + ": " + e.getMessage());
+            controladorPrincipal.mostrarMensajeError(
+                    GestorIdiomas.getText("error.guardarboveda.title"),
+                    e.getClass().getSimpleName() + ": " + e.getMessage()); // "Error al guardar la bóveda"
             return false;
         }
 
@@ -193,7 +205,9 @@ public class ControladorBovedas {
 
         DialogoPassword dialogoPassword = new DialogoPassword(controladorPrincipal.getPrimaryStage());
 
-        dialogoPassword.mostrar("Introduzca la contraseña maestra de la bóveda", passwordMaestra -> {
+        dialogoPassword.mostrar(
+                GestorIdiomas.getText("dialogopassword.content.simple"),
+                passwordMaestra -> { // "Introduzca la contraseña maestra de la bóveda"
 
             try {
                 guardarBovedaInterna(passwordMaestra);
@@ -229,9 +243,10 @@ public class ControladorBovedas {
                 GestorRutasAplicacion gestorRutasAplicacion = new GestorRutasAplicacion();
 
                 FileChooser selector = new FileChooser();
-                selector.setTitle("Guardar bóveda");
+                selector.setTitle(GestorIdiomas.getText("selectorarchivos.guardarboveda.title")); // "Guardar bóveda"
                 selector.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("Bóvedas (*.vlt)", "*.vlt")
+                        new FileChooser.ExtensionFilter(
+                                GestorIdiomas.getText("selectorarchivos.filter.text"), "*.vlt") // "Bóvedas (*.vlt)"
                 );
                 selector.setInitialDirectory(gestorRutasAplicacion.obtenerDirectorioBovedas().toFile());
 
@@ -272,7 +287,9 @@ public class ControladorBovedas {
             } catch (Exception e) {
 
                 e.printStackTrace();
-                controladorPrincipal.mostrarMensajeError("Error al crear bóveda", e.getClass().getSimpleName() + ":" + e.getMessage());
+                controladorPrincipal.mostrarMensajeError(
+                        GestorIdiomas.getText("error.crearboveda.title"),
+                        e.getClass().getSimpleName() + ":" + e.getMessage()); // "Error al crear bóveda"
 
             } finally {
                 Arrays.fill(password, '\0');
@@ -309,30 +326,37 @@ public class ControladorBovedas {
         Path rutaBoveda = controladorPrincipal.getRutaBoveda();
 
         if (rutaBoveda == null) {
-            controladorPrincipal.mostrarMensajeError("Error", "No hay ninguna bóveda abierta");
+            controladorPrincipal.mostrarMensajeError(
+                    GestorIdiomas.getText("texto.error"),
+                    GestorIdiomas.getText("error.bovedaabierta.content")); // "Error", "No hay ninguna bóveda abierta"
             return;
         }
 
         DialogoPassword dialogoPasswordActual = new DialogoPassword(controladorPrincipal.getPrimaryStage());
 
-        dialogoPasswordActual.mostrar("Introduzca la contraseña maestra actual", passwordActual -> {
+        dialogoPasswordActual.mostrar(GestorIdiomas.getText("dialogopassword.content.actual"), passwordActual -> { // "Introduzca la contraseña maestra actual"
             if (passwordActual == null || passwordActual.length == 0) {
                 return;
             }
 
             DialogoPassword dialogoPasswordNueva = new DialogoPassword(controladorPrincipal.getPrimaryStage());
-            dialogoPasswordNueva.mostrar("Introduzca la nueva contraseña maestra", passwordNueva -> {
+            dialogoPasswordNueva.mostrar(GestorIdiomas.getText("dialogopassword.content.nueva"),
+                    passwordNueva -> { // "Introduzca la nueva contraseña maestra"
                 if (passwordNueva == null || passwordActual.length == 0) {
-                    controladorPrincipal.mostrarMensajeError("Error", "La contraseña no es válida");
+                    controladorPrincipal.mostrarMensajeError(
+                            GestorIdiomas.getText("texto.error"),
+                            GestorIdiomas.getText("error.passwordnovalida"));  // "Error" - "La contraseña no es válida"
                     Arrays.fill(passwordActual, '\0');
                     return;
                 }
                 try {
                     gestorBovedas.cambiarPasswordMaestra(rutaBoveda, passwordActual, passwordNueva);
-                    controladorPrincipal.mostrarMensajeInformacion("Cambio de contraseña maestra", "El cambio se ha realizado correctamente");
+                    controladorPrincipal.mostrarMensajeInformacion(
+                            GestorIdiomas.getText("dialogopassword.cambio"),
+                            GestorIdiomas.getText("dialogopassword.cambiocorrecto")); // "Cambio de contraseña maestra", "El cambio se ha realizado correctamente"
                 } catch (Exception e) {
                     e.printStackTrace();
-                    controladorPrincipal.mostrarMensajeError("Error al cambiar la contraseña maestra",
+                    controladorPrincipal.mostrarMensajeError(GestorIdiomas.getText("error.cambiopassword"), // "Error al cambiar la contraseña maestra"
                             e.getClass().getSimpleName() + ": " + e.getMessage());
 
                 } finally {

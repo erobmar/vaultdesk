@@ -3,6 +3,7 @@ package com.vaultdesk.ui;
 import com.vaultdesk.controlador.ControladorPrincipal;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.negocio.GestorCategorias;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
@@ -38,10 +39,10 @@ public class VistaCategorias {
 
         tablaCategorias = new TableView<>();
 
-        TableColumn<Categoria, Number> columnaIdCategoria = new TableColumn<>("ID");
-        TableColumn<Categoria, String> columnaNombre = new TableColumn<>("Nombre");
-        TableColumn<Categoria, String> columnaDescripcion = new TableColumn<>("Descripción");
-        TableColumn<Categoria, String> columnaEsDelSistema = new TableColumn<>("Sistema");
+        TableColumn<Categoria, Number> columnaIdCategoria = new TableColumn<>(GestorIdiomas.getText("tablecolumn.id")); // "ID"
+        TableColumn<Categoria, String> columnaNombre = new TableColumn<>(GestorIdiomas.getText("tablecolumn.nombre")); // "Nombre"
+        TableColumn<Categoria, String> columnaDescripcion = new TableColumn<>(GestorIdiomas.getText("tablecolumn.descripcion")); // "Descripción"
+        TableColumn<Categoria, String> columnaEsDelSistema = new TableColumn<>(GestorIdiomas.getText("tablecolumn.sistema")); // "Sistema"
 
         columnaIdCategoria.setCellValueFactory(datos ->
                 new ReadOnlyObjectWrapper<>(datos.getValue().getIdCategoria()));
@@ -68,9 +69,9 @@ public class VistaCategorias {
         columnaDescripcion.setPrefWidth(300);
         columnaEsDelSistema.setPrefWidth(30);
 
-        Button botonNuevaCategoria = new Button("Nueva...");
-        Button botonEditarCategoria = new Button("Editar...");
-        Button botonEliminarCategoria = new Button("Eliminar");
+        Button botonNuevaCategoria = new Button(GestorIdiomas.getText("boton.nueva")); // "Nueva..."
+        Button botonEditarCategoria = new Button(GestorIdiomas.getText("boton.editar")); // "Editar..."
+        Button botonEliminarCategoria = new Button(GestorIdiomas.getText("boton.eliminar")); // "Eliminar"
 
         botonNuevaCategoria.setOnAction(e -> {
 
@@ -155,7 +156,7 @@ public class VistaCategorias {
             tablaCategorias.setItems(FXCollections.observableArrayList(categorias));
         } catch (Exception e) {
             root.setTop(barraSuperior);
-            root.setCenter(new Label("Error al cargar las categorías" + e.getMessage()));
+            root.setCenter(new Label(GestorIdiomas.getText("label.errorcargarcategorias") + e.getMessage())); // "Error al cargar las categorías"
             return root;
         }
 

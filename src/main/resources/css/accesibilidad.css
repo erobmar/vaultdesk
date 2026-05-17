@@ -1,0 +1,29 @@
+.root {
+    -fx-font-size: 16px;
+}
+
+.label {
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.text-field,
+.password-field,
+.text-area,
+.combo-box {
+    -fx-font-size: 16px;
+}
+
+.table-view {
+    -fx-font-size: 15px;
+}
+
+.tab-pane .tab-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}

@@ -1,6 +1,7 @@
 package com.vaultdesk.ui;
 
 import com.vaultdesk.controlador.ControladorPrincipal;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -38,13 +39,13 @@ public class VistaDialogos {
     public ButtonType mostrarConfirmacionCierre() {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Cerrar bóveda");
-        alert.setHeaderText("Hay cambios sin guardar");
-        alert.setContentText("¿Quieres guardar los cambios antes de cerrar la bóveda?");
+        alert.setTitle(GestorIdiomas.getText("alerta.cerrarboveda.title")); // "Cerrar bóveda"
+        alert.setHeaderText(GestorIdiomas.getText("alerta.cerrarboveda.header")); // "Hay cambios sin guardar"
+        alert.setContentText(GestorIdiomas.getText("alerta.cerrarboveda.content")); // "¿Quieres guardar los cambios antes de cerrar la bóveda?"
 
-        ButtonType botonGuardar = new ButtonType("Guardar");
-        ButtonType botonNoGuardar = new ButtonType("No Guardar");
-        ButtonType botonCancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType botonGuardar = new ButtonType(GestorIdiomas.getText("boton.guardar")); // "Guardar"
+        ButtonType botonNoGuardar = new ButtonType(GestorIdiomas.getText("boton.noguardar")); // "No Guardar"
+        ButtonType botonCancelar = new ButtonType(GestorIdiomas.getText("boton.cancelar"), ButtonBar.ButtonData.CANCEL_CLOSE); // "Cancelar"
 
         alert.getButtonTypes().setAll(botonGuardar, botonNoGuardar, botonCancelar);
 

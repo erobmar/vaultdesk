@@ -4,6 +4,7 @@ import com.vaultdesk.dominio.Boveda;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
 import com.vaultdesk.negocio.GestorCredenciales;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
@@ -216,11 +217,11 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay una bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay una conexión activa"
         }
 
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda activa"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
@@ -314,10 +315,10 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda activa"
         }
 
         Credencial credencial = new Credencial();
@@ -377,11 +378,11 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No existe ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No existe ninguna conexión activa"
         }
 
         if (bovedaActual == null) {
-            throw new IllegalStateException("No existe ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No existe ninguna bóveda abierta"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
@@ -403,9 +404,9 @@ public class ControladorCredenciales {
     public boolean confirmarEliminacionCredencial() {
 
         Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle("Eliminar credencial");
-        alerta.setHeaderText("Vas a eliminar una credencial");
-        alerta.setContentText("¿Estás seguro de que quieres continuar?");
+        alerta.setTitle(GestorIdiomas.getText("alerta.eliminarcredencial.title")); // "Eliminar credencial"
+        alerta.setHeaderText(GestorIdiomas.getText("alerta.eliminarcredencial.header")); // "Vas a eliminar una credencial"
+        alerta.setContentText(GestorIdiomas.getText("alerta.eliminarcredencial.content")); // "¿Estás seguro de que quieres continuar?"
 
         Optional<ButtonType> resultado = alerta.showAndWait();
 
@@ -429,7 +430,7 @@ public class ControladorCredenciales {
         Connection conexionActual = controladorPrincipal.getConexionActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
@@ -452,7 +453,7 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay una conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
 
         boolean nuevoValor = !credencial.isDestacada();
@@ -480,10 +481,10 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda abierta");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda abierta"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();
@@ -509,10 +510,10 @@ public class ControladorCredenciales {
         Boveda bovedaActual = controladorPrincipal.getBovedaActual();
 
         if (conexionActual == null || conexionActual.isClosed()) {
-            throw new IllegalStateException("No hay ninguna conexión activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.conexion")); // "No hay ninguna conexión activa"
         }
         if (bovedaActual == null) {
-            throw new IllegalStateException("No hay ninguna bóveda activa");
+            throw new IllegalStateException(GestorIdiomas.getText("excepcion.boveda")); // "No hay ninguna bóveda activa"
         }
 
         GestorCredenciales gestorCredenciales = new GestorCredenciales();

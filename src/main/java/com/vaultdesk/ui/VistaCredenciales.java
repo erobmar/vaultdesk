@@ -3,6 +3,7 @@ package com.vaultdesk.ui;
 import com.vaultdesk.controlador.ControladorPrincipal;
 import com.vaultdesk.dominio.Categoria;
 import com.vaultdesk.dominio.Credencial;
+import com.vaultdesk.negocio.GestorIdiomas;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
@@ -41,21 +42,21 @@ public class VistaCredenciales {
 
         tablaCredenciales = new TableView<>();
 
-        TableColumn<Credencial, Number> columnaID = new TableColumn<>("ID");
-        TableColumn<Credencial, String> columnaUsername = new TableColumn<>("Username");
-        TableColumn<Credencial, String> columnaUrlIdentificador = new TableColumn<>("URL/Identificador");
-        TableColumn<Credencial, String> columnaPassword = new TableColumn<>("Contraseña");
-        TableColumn<Credencial, String> columnaDestacada = new TableColumn<>("Destacada");
-        TableColumn<Credencial, String> columnaAnotaciones = new TableColumn<>("Anotaciones");
-        TableColumn<Credencial, String> columnaCaduca = new TableColumn<>("Caduca");
-        TableColumn<Credencial, String> columnaFechaCaducidad = new TableColumn<>("Fecha de caducidad");
-        TableColumn<Credencial, String> columnaPeriodoCaducidad = new TableColumn<>("Periodo caducidad (en días)");
-        TableColumn<Credencial, String> columnaReqLongitud = new TableColumn<>("Longitud requerida");
-        TableColumn<Credencial, String> columnaReqMayusculas = new TableColumn<>("Mayúsculas requeridas");
-        TableColumn<Credencial, String> columnaReqMinusculas = new TableColumn<>("Minúsculasas requeridas");
-        TableColumn<Credencial, String> columnaReqDigitos = new TableColumn<>("Dígitos requeridos");
-        TableColumn<Credencial, String> columnaReqEspeciales = new TableColumn<>("Caracteres especiales requeridos");
-        TableColumn<Credencial, String> columnaCategoria = new TableColumn<>("Categoría");
+        TableColumn<Credencial, Number> columnaID = new TableColumn<>(GestorIdiomas.getText("tablecolumn.id")); // "ID"
+        TableColumn<Credencial, String> columnaUsername = new TableColumn<>(GestorIdiomas.getText("tablecolumn.username")); // "Username"
+        TableColumn<Credencial, String> columnaUrlIdentificador = new TableColumn<>(GestorIdiomas.getText("tablecolumn.url")); // "URL/Identificador"
+        TableColumn<Credencial, String> columnaPassword = new TableColumn<>(GestorIdiomas.getText("tablecolumn.password")); // "Contraseña"
+        TableColumn<Credencial, String> columnaDestacada = new TableColumn<>(GestorIdiomas.getText("tablecolumn.destacada")); // "Destacada"
+        TableColumn<Credencial, String> columnaAnotaciones = new TableColumn<>(GestorIdiomas.getText("tablecolumn.anotaciones")); // "Anotaciones"
+        TableColumn<Credencial, String> columnaCaduca = new TableColumn<>(GestorIdiomas.getText("tablecolumn.caduca")); // "Caduca"
+        TableColumn<Credencial, String> columnaFechaCaducidad = new TableColumn<>(GestorIdiomas.getText("tablecolumn.fechacaducidad")); // "Fecha de caducidad"
+        TableColumn<Credencial, String> columnaPeriodoCaducidad = new TableColumn<>(GestorIdiomas.getText("tablecolumn.periodocaducidad")); // "Periodo caducidad (en días)"
+        TableColumn<Credencial, String> columnaReqLongitud = new TableColumn<>(GestorIdiomas.getText("tablecolumn.longitud")); // "Longitud requerida"
+        TableColumn<Credencial, String> columnaReqMayusculas = new TableColumn<>(GestorIdiomas.getText("tablecolumn.mayusculas")); // "Mayúsculas requeridas"
+        TableColumn<Credencial, String> columnaReqMinusculas = new TableColumn<>(GestorIdiomas.getText("tablecolumn.minusculas")); // "Minúsculasas requeridas"
+        TableColumn<Credencial, String> columnaReqDigitos = new TableColumn<>(GestorIdiomas.getText("tablecolumn.digitos")); // "Dígitos requeridos"
+        TableColumn<Credencial, String> columnaReqEspeciales = new TableColumn<>(GestorIdiomas.getText("tablecolumn.especiales")); // "Caracteres especiales requeridos"
+        TableColumn<Credencial, String> columnaCategoria = new TableColumn<>(GestorIdiomas.getText("tablecolumn.categoria")); // "Categoría"
 
 
         columnaID.setCellValueFactory(datos ->
@@ -152,23 +153,23 @@ public class VistaCredenciales {
         columnaPeriodoCaducidad.setPrefWidth(50);
 
         // Sección para botón de 'Nueva credencial' - "Editar credencial"
-        Button botonNuevaCredencial = new Button("Nueva...");
-        Button botonEditarCredencial = new Button("Editar...");
-        Button botonEliminarCredencial = new Button("Eliminar");
-        Button botonTogglePassword = new Button("Mostrar/Ocultar password");
-        Button botonCopiarPassword = new Button("Copiar password");
-        Button botonActualizarPassword = new Button("Actualizar password");
-        Button botonToggleDestacada = new Button("Marca/Descmarca destacada");
-        Button botonSoloDestacadas = new Button("Solo destacadas");
+        Button botonNuevaCredencial = new Button(GestorIdiomas.getText("boton.nueva")); // "Nueva..."
+        Button botonEditarCredencial = new Button(GestorIdiomas.getText("boton.editar")); // "Editar..."
+        Button botonEliminarCredencial = new Button(GestorIdiomas.getText("boton.eliminar")); // "Eliminar"
+        Button botonTogglePassword = new Button(GestorIdiomas.getText("boton.togglepassowrd")); // "Mostrar/Ocultar password"
+        Button botonCopiarPassword = new Button(GestorIdiomas.getText("boton.copiarpassword")); // "Copiar password"
+        Button botonActualizarPassword = new Button(GestorIdiomas.getText("boton.actualizarpassword")); // "Actualizar password"
+        Button botonToggleDestacada = new Button(GestorIdiomas.getText("boton.toggledestacada")); // "Marca/Descmarca destacada"
+        Button botonSoloDestacadas = new Button(GestorIdiomas.getText("boton.solodestacadas")); // "Solo destacadas"
 
 
         botonCopiarPassword.setDisable(true);
 
         // Sección de búsqueda
-        TextField campoBusqueda = new TextField("Buscar credenciales...");
+        TextField campoBusqueda = new TextField(GestorIdiomas.getText("texto.buscar")); // "Buscar credenciales..."
 
         ComboBox<Categoria> comboBoxFiltroCategorias = new ComboBox<>();
-        comboBoxFiltroCategorias.setPromptText("Filtrar por categoría");
+        comboBoxFiltroCategorias.setPromptText(GestorIdiomas.getText("prompt.filtrar")); // "Filtrar por categoría"
 
         // Poblar el ComboBox de categorías
         try {
@@ -179,16 +180,16 @@ public class VistaCredenciales {
         }
 
 
-        Button botonFiltrar = new Button("Filtrar");
-        Button botonLimpiarFiltro = new Button("Limpiar filtro");
+        Button botonFiltrar = new Button(GestorIdiomas.getText("boton.filtrar")); // "Filtrar"
+        Button botonLimpiarFiltro = new Button(GestorIdiomas.getText("boton.limpiarfiltro")); // "Limpiar filtro"
 
-        Button botonBuscar = new Button("Buscar");
-        Button botonLimpiarBusqueda = new Button("Limpiar búsqueda");
+        Button botonBuscar = new Button(GestorIdiomas.getText("boton.buscar")); // "Buscar"
+        Button botonLimpiarBusqueda = new Button(GestorIdiomas.getText("boton.limpiarbusqueda")); // "Limpiar búsqueda"
 
 
         botonNuevaCredencial.setOnAction(e -> {
 
-            DialogoNuevaCredencial dialogo = new DialogoNuevaCredencial((Stage) root.getScene().getWindow()); // TODO - Documentar
+            DialogoNuevaCredencial dialogo = new DialogoNuevaCredencial((Stage) root.getScene().getWindow());
 
             try {
 
@@ -379,9 +380,9 @@ public class VistaCredenciales {
 
 
             Alert alerta = new Alert(Alert.AlertType.INFORMATION);
-            alerta.setTitle("Contraseña copiada");
+            alerta.setTitle(GestorIdiomas.getText("alerta.passwordcopiada.title")); // "Contraseña copiada"
             alerta.setHeaderText(null);
-            alerta.setContentText("La contraseña se ha copiado al portapapeles");
+            alerta.setContentText(GestorIdiomas.getText("alerta.passwordcopiada.content")); // "La contraseña se ha copiado al portapapeles"
             alerta.showAndWait();
 
         });
@@ -492,7 +493,7 @@ public class VistaCredenciales {
             tablaCredenciales.setItems(FXCollections.observableArrayList(credenciales));
         } catch (Exception e) {
             root.setTop(controles);
-            root.setCenter(new Label("Error al cargar las credenciales" + e.getMessage()));
+            root.setCenter(new Label(GestorIdiomas.getText("label.errorcargarcredenciales") + e.getMessage())); // "Error al cargar las credenciales"
             return root;
         }
 
