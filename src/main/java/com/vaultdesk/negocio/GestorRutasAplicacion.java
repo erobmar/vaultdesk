@@ -44,6 +44,7 @@ public class GestorRutasAplicacion {
 
         } else if (sistemaOperativo.contains("mac")) {
 
+            directorioHome = System.getProperty("user.home");
             directorioTrabajo = Path.of(directorioHome, "Library", "Application Support", NOMBRE_APLICACION);
 
         } else {
