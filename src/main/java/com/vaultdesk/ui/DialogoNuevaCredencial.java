@@ -190,9 +190,11 @@ public class DialogoNuevaCredencial {
         parrilla.add(new Label(GestorIdiomas.getText("label.especiales")), 0, fila); // "Requisito caracteres especiales"
         parrilla.add(campoReqEspeciales, 1, fila++);
 
-        parrilla.add(etiquetaError, 0, fila, 2, 1);
         parrilla.add(botonAceptar, 0, fila);
-        parrilla.add(botonCancerlar, 1, fila);
+        parrilla.add(botonCancerlar, 1, fila++);
+
+        parrilla.add(etiquetaError, 0, fila, 2, 1);
+
 
         dialogo.setScene(new Scene(parrilla, 400, 600));
         dialogo.show();
