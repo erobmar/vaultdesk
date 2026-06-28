@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Clase de test para prueba de integración
  *
  */
-class VaultDeskIntegracionTest {
+class 09906VaultDeskIntegracionTest {
 
     private final GestorBaseDatos gestorBaseDatos = new GestorBaseDatos();
     private final GestorBovedas gestorBovedas = new GestorBovedas();
