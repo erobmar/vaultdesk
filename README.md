@@ -1,4 +1,4 @@
-# VaultDesk Alpha 1.0
+# VaultDesk 1.0
 
 Aplicación de escritorio para gestión local y cifrada de credenciales.
 
